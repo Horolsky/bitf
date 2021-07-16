@@ -1,2 +1,3 @@
 # bitf
-flexible generic bitfield library 
+
+flexible generic bitfields
