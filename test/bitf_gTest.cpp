@@ -75,6 +75,14 @@ TEST(data, assignment)
     b = a;
 	EXPECT_EQ(a.bits(), b.bits());
 }
+TEST(data, comparison)
+{
+    BitF a {474434687};
+    BitF b {0};
+	EXPECT_NE(a, b);
+    b = a;
+    EXPECT_EQ(a, b);
+}
 
 TEST(mutator, set_zero)
 {
