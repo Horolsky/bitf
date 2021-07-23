@@ -48,7 +48,7 @@ gtest.a : gtest-all.o
 gtest_main.a : gtest-all.o gtest_main.o
 	$(AR) $(ARFLAGS) $@ $^
 
-bitf_gTest.o : $(TEST_DIR)/bitf_gTest.cpp $(SOURCE_DIR)/*.h $(GTEST_HEADERS)
+bitf_gTest.o : $(TEST_DIR)/bitf_gTest.cpp $(SOURCE_DIR)/*.hpp $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) -I$(SOURCE_DIR) $(CXXFLAGS) -c $(TEST_DIR)/bitf_gTest.cpp
 
 bitf_gTest : bitf_gTest.o gtest_main.a
