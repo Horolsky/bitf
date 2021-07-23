@@ -67,6 +67,13 @@ TEST(bitdata, set_zero)
 	EXPECT_EQ(x.bits(), 0b0);
 }
 
+TEST(bitdata, copy_constructor)
+{
+    BitF a {474434687};
+    BitF b = a;
+	EXPECT_EQ(a.bits(), b.bits());
+}
+
 TEST(bitdata, insert_1bit)
 {
     BitF x {0b10001};
