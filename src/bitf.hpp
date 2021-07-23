@@ -46,8 +46,12 @@ namespace bitf
         data(T val) : _bits(val) {};
         //copy constructor
         data(data& bd) : _bits(bd._bits) {};
-        //move constructor
-        data(data&& bd) : _bits(bd._bits) {};
+
+        data<T>& operator=(const data<T>& other)
+        {
+            data<T>::_bits = other._bits;
+            return *this;
+        }
 
         //full bitfield value
         T bits()const { return _bits; }; 
@@ -163,8 +167,8 @@ namespace bitf
         template <class T>
     class mutator : public virtual data<T>
     {
-    public:
-    
+    public:     
+
         //set bits value
         void set(T value)
         {
