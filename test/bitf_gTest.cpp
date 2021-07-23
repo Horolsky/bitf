@@ -20,17 +20,6 @@ public virtual mutator<size_t>
 {
     public:
     using constructor<size_t>::constructor;
-    using accessor<size_t>::get;
-    using mutator<size_t>::set;
-    using mutator<size_t>::insert;
-
-    using data<size_t>::bits;
-    using data<size_t>::str;
-
-    using data<size_t>::nofbits;
-    using data<size_t>::type;
-    using data<size_t>::maxvalue;
-    using data<size_t>::bitsize;
 };
 
 TEST(data_static, bitsize)
