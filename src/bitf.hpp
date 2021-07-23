@@ -125,7 +125,7 @@ namespace bitf
             }
             if (data<T>::nofbits(maxvalue) > offset)
                 throw;
-            T offsetmask = data<T>::MAX >> ((data<T>::MAXINDEX - offset - 1) * n);
+            T offsetmask = data<T>::MAX >> (data<T>::MAXINDEX - offset*n);
             T mask = ~(offsetmask << index);
             data<T>::_bits &= mask;
             i = 0;
@@ -219,7 +219,7 @@ namespace bitf
             }
             if (data<T>::nofbits(maxvalue) > offset)
                 throw;
-            T offsetmask = data<T>::MAX >> ((data<T>::MAXINDEX - offset - 1) * n);
+            T offsetmask = data<T>::MAX >> (data<T>::MAXINDEX - offset*n);
             T mask = ~(offsetmask << index);
             data<T>::_bits &= mask;
             i = 0;
