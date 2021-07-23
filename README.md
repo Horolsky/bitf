@@ -3,10 +3,10 @@
 flexible generic bitfields
 ___
 
-**data.h**:         basic class for data storage  
-**constructor.h**:  atomic bitfield constructors  
-**accessor.h**:     atomic bitfield getters  
-**mutator.h**:      atomic bitfield setters for mutable classes with same functionality as constructors  
+**bitf::data**:         basic class for data storage  
+**bitf::constructor**:  atomic bitfield constructors  
+**bitf::accessor**:     atomic bitfield getters  
+**bitf::mutator**:      atomic bitfield setters for mutable classes with same functionality as constructors  
 
 ## example of subclass design
 ```c++
