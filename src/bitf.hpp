@@ -49,8 +49,17 @@ namespace bitf
 
         data<T>& operator=(const data<T>& other)
         {
-            data<T>::_bits = other._bits;
+            _bits = other._bits;
             return *this;
+        }
+
+        bool operator==(const data<T>& other) const
+        {
+            return _bits == other._bits;
+        }
+        bool operator!=(const data<T>& other) const
+        {
+            return _bits != other._bits;
         }
 
         //full bitfield value
