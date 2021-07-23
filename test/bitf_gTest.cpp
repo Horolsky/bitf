@@ -1,7 +1,4 @@
-#include "data.h"
-#include "constructor.h"
-#include "accessor.h"
-#include "mutator.h"
+#include "bitf.hpp"
 
 #include "gtest/gtest.h"
 
