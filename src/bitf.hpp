@@ -89,23 +89,22 @@ namespace bitf
          * create bitfield with atomic value
          * other bits are set to 0
          */
-        constructor(T value, int index)
+        constructor(T value, int index, T bits = 0)
         {
-            data<T>::_bits = 0;
             index &= data<T>::MAXINDEX;
 
             T offset = data<T>::BITSIZE - index;
             if (data<T>::nofbits(value) > offset)
                 throw;
-            data<T>::_bits |= (value << index);
+            bits |= (value << index);
+            data<T>::_bits = bits;
         };
         /**
          * create bitfield with vector of atomic values
          * other bits are set to 0
          */
-        constructor(std::vector<T> values, int index, T offset)
+        constructor(std::vector<T> values, int index, T offset, T bits = 0)
         {
-            data<T>::_bits = 0;
             T n = values.size();
             if (!n) return;
 
@@ -127,13 +126,14 @@ namespace bitf
                 throw;
             T offsetmask = data<T>::MAX >> (data<T>::MAXINDEX - offset*n);
             T mask = ~(offsetmask << index);
-            data<T>::_bits &= mask;
+            bits &= mask;
             i = 0;
             while (i < n)
             {
-                data<T>::_bits |= (values[i] << (offset * i + index));
+                bits |= (values[i] << (offset * i + index));
                 i++;
             }
+            data<T>::_bits = bits;
         };
     };
 
