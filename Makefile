@@ -24,8 +24,10 @@ MACHINE_NAME = $(shell uname -m)
 GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
                 $(GTEST_DIR)/include/gtest/internal/*.h
 
+.PHONY: all clean build test
+
 # House-keeping build targets.
-all : $(TESTS)
+all : test
 
 clean :
 	rm -fr $(TESTS) gtest.a gtest_main.a *.o
@@ -51,7 +53,9 @@ gtest_main.a : gtest-all.o gtest_main.o
 bitf_gTest.o : $(TEST_DIR)/bitf_gTest.cpp $(SOURCE_DIR)/*.hpp $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) -I$(SOURCE_DIR) $(CXXFLAGS) -c $(TEST_DIR)/bitf_gTest.cpp
 
-bitf_gTest : bitf_gTest.o gtest_main.a
+$(TESTS) : bitf_gTest.o gtest_main.a
 	@echo "Building $@ for $(KERNEL_NAME) $(MACHINE_NAME)"
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -L. 
+
+test: $(TESTS)
 	./$(TESTS)
