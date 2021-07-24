@@ -1,0 +1,15 @@
+stages:       
+  - test
+
+unit-test-job:
+  stage: test
+  tags:
+  - linux
+  image: gcc
+  before_script:
+    - echo "Installing googletest"
+    - git clone https://github.com/google/googletest ../googletest
+  script:
+    - echo "Running unit tests..."
+    - make all
+    - echo "Tests complete."
