@@ -1,0 +1,13 @@
+name: ci-test
+on: [push]
+jobs:
+  run-unit-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: echo "Installing googletest..."
+      - run: git clone https://github.com/google/googletest ../googletest
+      - run: echo "Googletest installed successfully."
+      - run: echo "Running unit tests..."
+      - run: make all
+      - run: echo "Tests complete."
