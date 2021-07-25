@@ -174,7 +174,7 @@ namespace bitf
          */
         constructor(T value, int index, T bits = 0)
         {
-            data<T>::_bits = func<T>::insert(value, index, func<T>::BITSIZE - index, bits);
+            data<T>::_bits = func<T>::insert(value, index, func<T>::nofbits(value), bits);
         };
         /**
          * create bitfield with vector of atomic values
