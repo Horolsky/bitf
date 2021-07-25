@@ -5,12 +5,6 @@
 #include <vector>
 using namespace bitf;
 
-template class data<size_t>;
-template class constructor<size_t>;
-template class accessor<size_t>;
-template class mutator<size_t>;
-
-
 //test class
 class BitF : 
 public virtual data<size_t>,
@@ -29,7 +23,7 @@ TEST(data_static, bitsize)
 
 TEST(data_static, nofbits)
 {
-	EXPECT_EQ(BitF::nofbits(0b10101), 5);
+	EXPECT_EQ(func<size_t>::nofbits(0b10101), 5);
 }
 
 TEST(data, init_def)

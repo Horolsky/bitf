@@ -3,81 +3,164 @@
 #include <string>
 #include <type_traits>
 
-
 namespace bitf
 {
+    /**
+     * static template class with basic constants and functions
+     * T: primitive unsigned integer type
+     */ 
+    template <typename T,
+              std::enable_if_t<std::is_unsigned<T>::value, bool> = true>
+    class func
+    {
+    private:
+        func() {}
+        ~func() {}
+        func(const func &);
+        func &operator=(const func &);
+
+    public:
+        //bitfield storage type
+        typedef T type;
+        //max value of bitfield storage type
+        static const T MAX = ~0;
+        //number of stored bits
+        static const T BITSIZE = sizeof(T) << 0b11;
+        //max index of bitfield (BITSIZE - 1)
+        static const T MAXINDEX = BITSIZE - 1;
+        //number of bits needed to store value
+        static size_t nofbits(T value)
+        {
+            size_t n = 1;
+            while (value >>= 1)
+                n++;
+            return n;
+        };
+        //stringify binary representation of bitfield
+        static std::string str(T bits)
+        {
+            std::string res(BITSIZE, '0');
+            for (size_t i = 0; i < BITSIZE; i++)
+            {
+                if ((bits >> i) & 1)
+                    res[BITSIZE - i - 1] = '1';
+            }
+            return res;
+        };
+        //get atomic value from bitdata
+        static T get(T bits, int index, size_t offset)
+        {
+            index &= MAXINDEX;
+            if (offset > (BITSIZE - index)) throw;
+            T offsetmask = MAX >> (BITSIZE - offset);
+            return (bits >> index) & offsetmask;
+        };
+        //get vector of n atomic values from bitdata
+        static std::vector<T> get(T bits, int index, size_t offset, size_t n)
+        {
+            index &= MAXINDEX;
+
+            if (offset > (BITSIZE - index)) throw;
+            size_t maxn = (BITSIZE - index) / offset;
+            n = n > maxn ? maxn : n;
+
+            std::vector<T> res{};
+            T offsetmask = MAX >> (BITSIZE - offset);
+
+            for (size_t i = 0; i < n; i++)
+            {
+                size_t rshift = (index + (offset * i));
+                T shifted = bits >> rshift;
+                T val = (shifted & offsetmask);
+                res.push_back(val);
+            }
+
+            return res;
+        };
+        //insert atomic value to bitfield
+        static T insert(T value, int index, size_t offset, T bits = 0)
+        {
+            index &= MAXINDEX;
+            if (offset > (BITSIZE - index)) throw;
+            T offsetmask = MAX >> (BITSIZE - (offset + index));
+            T indexmask = offsetmask >> index;
+            T mask = ~(offsetmask ^ indexmask);
+            bits &= mask;
+            bits |= (value << index);
+            return bits;
+        };
+        //insert vector of atomic values to bitfield
+        static T insert(std::vector<T> values, int index, size_t offset, T bits = 0)
+        {
+            T n = values.size();
+            if (!n)
+                return bits;
+
+            index &= MAXINDEX;
+            if (offset > (BITSIZE - index)) throw;
+
+            T maxn = (BITSIZE - index) / offset;
+            if (n > maxn) throw;
+
+            T maxvalue = values[0];
+            size_t i = 0;
+            while (i < n)
+            {
+                if (values[i] > maxvalue)
+                    maxvalue = values[i];
+                i++;
+            }
+            if (nofbits(maxvalue) > offset) throw;
+
+            T offsetmask = MAX >> (BITSIZE - (offset * n + index));
+            T indexmask = offsetmask >> index;
+            T mask = ~(offsetmask ^ indexmask);
+            bits &= mask;
+            i = 0;
+            while (i < n)
+            {
+                bits |= (values[i] << (offset * i + index));
+                i++;
+            }
+            return bits;
+        };
+    };
+
     template <typename T,
               std::enable_if_t<std::is_unsigned<T>::value, bool> = true>
     class data
     {
     protected:
         T _bits;
-
-        //max value of bitfield storage type
-        static const T MAX = ~0;
-
-        //number of stored bits
-        static const T BITSIZE = sizeof(T) << 0b11;
-        static const T MAXINDEX = BITSIZE - 1;
-
     public:
-
-        //bitfield storage type
-        typedef T type;
-
         //max value of bitfield storage type
-        static T maxvalue() { return MAX; }
-        
+        static T maxvalue() { return func<T>::MAX; }
+
         //number of stored bits
-        static T bitsize() { return BITSIZE; };
-    
-        //number of bits needed to store value
-        static size_t nofbits(T value) 
-        {
-            size_t n = 1;
-            while (value >>= 1) n++;
-            return n;
-        };
+        static T bitsize() { return func<T>::BITSIZE; };
 
         //initialization with zero
-        data() : _bits(0) {}; 
+        data() : _bits(0){};
 
         //initialization with given value
-        data(T val) : _bits(val) {};
+        data(T val) : _bits(val){};
         //copy constructor
-        data(data& bd) : _bits(bd._bits) {};
+        data(data &bd) : _bits(bd._bits){};
 
-        data<T>& operator=(const data<T>& other)
+        data<T> &operator=(const data<T> &other)
         {
             _bits = other._bits;
             return *this;
         }
 
-        bool operator==(const data<T>& other) const
-        {
-            return _bits == other._bits;
-        }
-        bool operator!=(const data<T>& other) const
-        {
-            return _bits != other._bits;
-        }
+        inline bool operator==(const data<T> &other) const { return _bits == other._bits; }
+        inline bool operator!=(const data<T> &other) const { return _bits != other._bits; }
 
         //full bitfield value
-        T bits()const { return _bits; }; 
+        T bits() const { return _bits; };
 
         //stringify binary representation of bitfield
-        std::string str() const             
-        {
-            std::string res(BITSIZE, '0');
-            
-            for (size_t i = 0; i < BITSIZE; i++)
-            {
-                if ((_bits >> i) & 1)
-                    res[BITSIZE-i-1] = '1';
-            }
-
-            return res;
-        };
+        inline std::string str() const { return func<T>::str(_bits); };
     };
 
     template <class T>
@@ -91,143 +174,39 @@ namespace bitf
          */
         constructor(T value, int index, T bits = 0)
         {
-            index &= data<T>::MAXINDEX;
-
-            T offset = data<T>::BITSIZE - index;
-            if (data<T>::nofbits(value) > offset)
-                throw;
-            bits |= (value << index);
-            data<T>::_bits = bits;
+            data<T>::_bits = func<T>::insert(value, index, func<T>::BITSIZE - index, bits);
         };
         /**
          * create bitfield with vector of atomic values
          * other bits are set to 0
          */
-        constructor(std::vector<T> values, int index, T offset, T bits = 0)
+        constructor(std::vector<T> values, int index, size_t offset, T bits = 0)
         {
-            T n = values.size();
-            if (!n) return;
-
-            index &= data<T>::MAXINDEX;
-            offset = (--offset & data<T>::MAXINDEX) + 1;
-            T maxn = (data<T>::BITSIZE - index) / offset;
-            if (n > maxn)
-                throw;
-
-            T maxvalue = values[0];
-            size_t i = 0;
-            while (i < n)
-            {
-                if (values[i] > maxvalue)
-                    maxvalue = values[i];
-                i++;
-            }
-            if (data<T>::nofbits(maxvalue) > offset)
-                throw;
-            T offsetmask = data<T>::MAX >> (data<T>::MAXINDEX - offset*n);
-            T mask = ~(offsetmask << index);
-            bits &= mask;
-            i = 0;
-            while (i < n)
-            {
-                bits |= (values[i] << (offset * i + index));
-                i++;
-            }
-            data<T>::_bits = bits;
+            data<T>::_bits = func<T>::insert(values, index, offset, bits);
         };
     };
 
-        template <class T>
+    template <class T>
     class accessor : public virtual data<T>
     {
     public:
         //get atomic value from bitdata
-        T get(int index, T offset) const
-        {
-            index &= data<T>::MAXINDEX;
-            offset = (--offset & data<T>::MAXINDEX) + 1;
-            T offsetmask = data<T>::MAX >> (data<T>::BITSIZE - offset);
-            return (data<T>::_bits >> index) & offsetmask;
-        };
+        inline T get(int index, size_t offset) const { return func<T>::get(data<T>::_bits, index, offset); };
         //get vector of n atomic values from bitdata
-        std::vector<T> get(int index, T offset, T n) const
-        {
-            index &= data<T>::MAXINDEX;
-
-            offset = (--offset & data<T>::MAXINDEX) + 1;
-            T maxn = (data<T>::BITSIZE - index) / offset;
-            n = n > maxn ? maxn : n;
-
-            std::vector<T> res{};
-            T offsetmask = data<T>::MAX >> (data<T>::BITSIZE - offset);
-
-            for (size_t i = 0; i < n; i++)
-            {
-                T rshift = (index + (offset * i));
-                T shifted = data<T>::_bits >> rshift;
-                T val = (shifted & offsetmask);
-                res.push_back(val);
-            }
-
-            return res;
-        };
+        inline std::vector<T> get(int index, size_t offset, T n) const { return func<T>::get(data<T>::_bits, index, offset, n); };
     };
 
-        template <class T>
+    template <class T>
     class mutator : public virtual data<T>
     {
-    public:     
-
+    public:
         //set bits value
-        void set(T value)
-        {
-            data<T>::_bits = value;
-        };
+        inline void set(T value) { data<T>::_bits = value; };
 
         //insert atomic value to bitfield
-        void insert(T value, int index, T offset)
-        {
-            index &= data<T>::MAXINDEX;
-            offset = (--offset & data<T>::MAXINDEX) + 1;
-            if (data<T>::nofbits(value) > offset)
-                throw;
-            T offsetmask = data<T>::MAX >> (data<T>::BITSIZE - offset);
-            T mask = ~(offsetmask << index);
-            data<T>::_bits &= mask;
-            data<T>::_bits |= (value << index);
-        };
+        inline void insert(T value, int index, size_t offset) { data<T>::_bits = func<T>::insert(value, index, offset, data<T>::_bits); };
 
         //insert vector of atomic values to bitfield
-        void insert(std::vector<T> values, int index, T offset)
-        {
-            T n = values.size();
-            if (!n) return;
-
-            index &= data<T>::MAXINDEX;
-            offset = (--offset & data<T>::MAXINDEX) + 1;
-            T maxn = (data<T>::BITSIZE - index) / offset;
-            if (n > maxn)
-                throw;
-
-            T maxvalue = values[0];
-            size_t i = 0;
-            while (i < n)
-            {
-                if (values[i] > maxvalue)
-                    maxvalue = values[i];
-                i++;
-            }
-            if (data<T>::nofbits(maxvalue) > offset)
-                throw;
-            T offsetmask = data<T>::MAX >> (data<T>::MAXINDEX - offset*n);
-            T mask = ~(offsetmask << index);
-            data<T>::_bits &= mask;
-            i = 0;
-            while (i < n)
-            {
-                data<T>::_bits |= (values[i] << (offset * i + index));
-                i++;
-            }
-        };
+        inline void insert(std::vector<T> values, int index, size_t offset) { data<T>::_bits = func<T>::insert(values, index, offset, data<T>::_bits); };
     };
 }
