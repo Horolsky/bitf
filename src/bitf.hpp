@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <type_traits>
+#include <stdexcept>
 
 namespace bitf
 {
@@ -51,7 +52,7 @@ namespace bitf
         static T get(T bits, int index, size_t offset)
         {
             index &= MAXINDEX;
-            if (offset > (BITSIZE - index)) throw;
+            if (offset + index > BITSIZE) throw std::overflow_error("offset + index > BITSIZE");
             T offsetmask = MAX >> (BITSIZE - offset);
             return (bits >> index) & offsetmask;
         };
@@ -60,7 +61,7 @@ namespace bitf
         {
             index &= MAXINDEX;
 
-            if (offset > (BITSIZE - index)) throw;
+            if (offset + index > BITSIZE) throw std::overflow_error("offset + index > BITSIZE");
             size_t maxn = (BITSIZE - index) / offset;
             n = n > maxn ? maxn : n;
 
@@ -81,7 +82,7 @@ namespace bitf
         static T insert(T value, int index, size_t offset, T bits = 0)
         {
             index &= MAXINDEX;
-            if (offset > (BITSIZE - index)) throw;
+            if (offset + index > BITSIZE) throw std::overflow_error("offset + index > BITSIZE");
             T offsetmask = MAX >> (BITSIZE - (offset + index));
             T indexmask = offsetmask >> index;
             T mask = ~(offsetmask ^ indexmask);
@@ -97,10 +98,10 @@ namespace bitf
                 return bits;
 
             index &= MAXINDEX;
-            if (offset > (BITSIZE - index)) throw;
+            if (offset + index > BITSIZE) throw std::overflow_error("offset + index > BITSIZE");
 
             T maxn = (BITSIZE - index) / offset;
-            if (n > maxn) throw;
+            if (n > maxn) throw std::overflow_error("vector size > bitfield size");
 
             T maxvalue = values[0];
             size_t i = 0;
@@ -110,7 +111,7 @@ namespace bitf
                     maxvalue = values[i];
                 i++;
             }
-            if (nofbits(maxvalue) > offset) throw;
+            if (nofbits(maxvalue) > offset) throw std::overflow_error("vector value > offset");
 
             T offsetmask = MAX >> (BITSIZE - (offset * n + index));
             T indexmask = offsetmask >> index;
