@@ -194,8 +194,9 @@ namespace bitf
         T get(int index, size_t offset) const { return func<T>::get(data<T>::_bits, index, offset); };
         //get vector of n atomic values from bitdata
         std::vector<T> get(int index, size_t offset, T n) const { return func<T>::get(data<T>::_bits, index, offset, n); };
-    
-    
+        //get single bit value by index
+        T operator[](int index) const { return func<T>::get(data<T>::_bits, index, 1); };
+     
     };
 
     template <class T>
