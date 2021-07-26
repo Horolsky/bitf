@@ -204,19 +204,22 @@ TEST(constructor, vector_update)
 
 #pragma region TEST_ACCESSOR
 
-TEST(accessor, get_onebit)
+TEST(accessor, get_value)
 {
-    BitF x {0b10101};
-    size_t a = x.get(2, 1);
-	EXPECT_EQ(a, 0b1);
+    BitF x1 {0b10101};
+    size_t a1 = x1.get(2, 1);
+	EXPECT_EQ(a1, 0b1);
+
+    BitF x2 {0b10101};
+    size_t a2 = x2.get(2, 3);
+	EXPECT_EQ(a2, 0b101);
+
+    BitF x3 {0b10101};
+    size_t a3 = x3[0];
+	EXPECT_EQ(a3, 0b1);
 }
 
-TEST(accessor, get_3bits)
-{
-    BitF x {0b10101};
-    size_t a = x.get(2, 3);
-	EXPECT_EQ(a, 0b101);
-}
+
 TEST(accessor, get_vector)
 {
     BitF x {0b1100100001};
