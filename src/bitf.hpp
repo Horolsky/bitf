@@ -147,6 +147,8 @@ namespace bitf
         //copy constructor
         data(data &bd) : _bits(bd._bits){};
 
+        virtual ~data() { };
+
         data<T> &operator=(const data<T> &other)
         {
             _bits = other._bits;
@@ -160,7 +162,7 @@ namespace bitf
         T bits() const { return _bits; };
 
         //stringify binary representation of bitfield
-        std::string str() const { return func<T>::str(_bits); };
+        virtual std::string str() const { return func<T>::str(_bits); };
     };
 
     template <class T>
@@ -184,6 +186,7 @@ namespace bitf
         {
             data<T>::_bits = func<T>::insert(values, index, offset, bits);
         };
+        virtual ~constructor() { };
     };
 
     template <class T>
@@ -191,11 +194,11 @@ namespace bitf
     {
     public:
         //get atomic value from bitdata
-        T get(int index, size_t offset) const { return func<T>::get(data<T>::_bits, index, offset); };
+        virtual T get(int index, size_t offset) const { return func<T>::get(data<T>::_bits, index, offset); };
         //get vector of n atomic values from bitdata
-        std::vector<T> get(int index, size_t offset, T n) const { return func<T>::get(data<T>::_bits, index, offset, n); };
+        virtual std::vector<T> get(int index, size_t offset, T n) const { return func<T>::get(data<T>::_bits, index, offset, n); };
         //get single bit value by index
-        T operator[](int index) const { return func<T>::get(data<T>::_bits, index, 1); };
+        virtual T operator[](int index) const { return func<T>::get(data<T>::_bits, index, 1); };
      
     };
 
@@ -204,12 +207,12 @@ namespace bitf
     {
     public:
         //set bits value
-        void set(T value) { data<T>::_bits = value; };
+        virtual void set(T value) { data<T>::_bits = value; };
 
         //insert atomic value to bitfield
-        void insert(T value, int index, size_t offset) { data<T>::_bits = func<T>::insert(value, index, offset, data<T>::_bits); };
+        virtual void insert(T value, int index, size_t offset) { data<T>::_bits = func<T>::insert(value, index, offset, data<T>::_bits); };
 
         //insert vector of atomic values to bitfield
-        void insert(std::vector<T> values, int index, size_t offset) { data<T>::_bits = func<T>::insert(values, index, offset, data<T>::_bits); };
+        virtual void insert(std::vector<T> values, int index, size_t offset) { data<T>::_bits = func<T>::insert(values, index, offset, data<T>::_bits); };
     };
 }
