@@ -7,8 +7,9 @@
 namespace bitf
 {
     /**
-     * static template class with basic constants and functions
-     * T: primitive unsigned integer type
+     * static template class for bitwise operations on
+     * primitive data of type T
+     * T: unsigned integer type
      */ 
     template <typename T,
               std::enable_if_t<std::is_unsigned<T>::value, bool> = true>
