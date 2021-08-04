@@ -1,8 +1,9 @@
 #pragma once
-#include <vector>
+
+#include <stdexcept>
 #include <string>
 #include <type_traits>
-#include <stdexcept>
+#include <vector>
 
 namespace bitf
 {
@@ -14,16 +15,18 @@ namespace bitf
     template <typename T,
               std::enable_if_t<std::is_unsigned<T>::value, bool> = true>
     class func
-    {
-    private:
-        func() {}
-        ~func() {}
-        func(const func &);
-        func &operator=(const func &);
-
+    {      
     public:
+        func() = delete;
+        ~func() = delete;
+        func(const func &) = delete;
+        func(func &&) noexcept = delete;
+        func &operator=(const func &) = delete;
+        func &operator=(func &&) noexcept = delete;
+
+
         //bitfield storage type
-        typedef T type;
+        typedef T type; 
         //max value of bitfield storage type
         static const T MAX = ~0;
         //number of stored bits
@@ -35,7 +38,7 @@ namespace bitf
         {
             size_t n = 1;
             while (value >>= 1)
-                n++;
+                {n++;}
             return n;
         };
         //stringify binary representation of bitfield
@@ -45,7 +48,7 @@ namespace bitf
             for (size_t i = 0; i < BITSIZE; i++)
             {
                 if ((bits >> i) & 1)
-                    res[BITSIZE - i - 1] = '1';
+                    {res[BITSIZE - i - 1] = '1';}
             }
             return res;
         };
@@ -53,7 +56,7 @@ namespace bitf
         static T get(T bits, int index, size_t offset)
         {
             index &= MAXINDEX;
-            if (offset + index > BITSIZE) throw std::overflow_error("offset + index > BITSIZE");
+            if (offset + index > BITSIZE) {throw std::overflow_error("offset + index > BITSIZE");}
             T offsetmask = MAX >> (BITSIZE - offset);
             return (bits >> index) & offsetmask;
         };
@@ -62,7 +65,7 @@ namespace bitf
         {
             index &= MAXINDEX;
 
-            if (offset + index > BITSIZE) throw std::overflow_error("offset + index > BITSIZE");
+            if (offset + index > BITSIZE) {throw std::overflow_error("offset + index > BITSIZE");}
             size_t maxn = (BITSIZE - index) / offset;
             n = n > maxn ? maxn : n;
 
@@ -83,7 +86,7 @@ namespace bitf
         static T insert(T value, int index, size_t offset, T bits = 0)
         {
             index &= MAXINDEX;
-            if (offset + index > BITSIZE) throw std::overflow_error("offset + index > BITSIZE");
+            if (offset + index > BITSIZE) {throw std::overflow_error("offset + index > BITSIZE");}
             T offsetmask = MAX >> (BITSIZE - (offset + index));
             T indexmask = offsetmask >> index;
             T mask = ~(offsetmask ^ indexmask);
@@ -96,23 +99,23 @@ namespace bitf
         {
             T n = values.size();
             if (!n)
-                return bits;
+               { return bits; }
 
             index &= MAXINDEX;
-            if (offset + index > BITSIZE) throw std::overflow_error("offset + index > BITSIZE");
+            if (offset + index > BITSIZE) {throw std::overflow_error("offset + index > BITSIZE");}
 
             T maxn = (BITSIZE - index) / offset;
-            if (n > maxn) throw std::overflow_error("vector size > bitfield size");
+            if (n > maxn) {throw std::overflow_error("vector size > bitfield size");}
 
             T maxvalue = values[0];
             size_t i = 0;
             while (i < n)
             {
                 if (values[i] > maxvalue)
-                    maxvalue = values[i];
+                    {maxvalue = values[i];}
                 i++;
             }
-            if (nofbits(maxvalue) > offset) throw std::overflow_error("vector value > offset");
+            if (nofbits(maxvalue) > offset) {throw std::overflow_error("vector value > offset");}
 
             T offsetmask = MAX >> (BITSIZE - (offset * n + index));
             T indexmask = offsetmask >> index;
@@ -140,17 +143,19 @@ namespace bitf
         //number of stored bits
         static T bitsize() { return func<T>::BITSIZE; };
 
-        //initialization with zero
         data() : _bits(0){};
+        explicit data(T val) : _bits(val){};
+        data(data const &bd) : _bits(bd._bits){};
+        data(data &&bd) noexcept : _bits(bd._bits){};
 
-        //initialization with given value
-        data(T val) : _bits(val){};
-        //copy constructor
-        data(data &bd) : _bits(bd._bits){};
+        virtual ~data() = default;
 
-        virtual ~data() { };
-
-        data<T> &operator=(const data<T> &other)
+        data<T> &operator=(data<T> const &other)
+        {
+            _bits = other._bits;
+            return *this;
+        }
+        data<T> &operator=(data<T> &&other) noexcept
         {
             _bits = other._bits;
             return *this;
@@ -187,7 +192,7 @@ namespace bitf
         {
             data<T>::_bits = func<T>::insert(values, index, offset, bits);
         };
-        virtual ~constructor() { };
+        virtual ~constructor() = default;
     };
 
     template <class T>
@@ -216,4 +221,4 @@ namespace bitf
         //insert vector of atomic values to bitfield
         virtual void insert(std::vector<T> values, int index, size_t offset) { data<T>::_bits = func<T>::insert(values, index, offset, data<T>::_bits); };
     };
-}
+} //namespace bitf
