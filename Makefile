@@ -30,20 +30,20 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 all : test
 
 format: .clang-format
-	clang-format -style=file src/*
+	clang-format -i -style=file src/* test/*
 
 CPPCHECK = cppcheck
 CHECKFLAGS = -q --error-exitcode=1
 CHECKLOG = cppcheck.out.xml
 
 $(CHECKLOG): 
-	$(CPPCHECK) $(CHECKFLAGS) src/* --xml >$@
+	$(CPPCHECK) $(CHECKFLAGS) src/* test/* --xml >$@
 
 check:
-	cppcheck --enable=all --verbose src/* --xml  2>$(CHECKLOG)
+	cppcheck --enable=all --verbose src/* test/* --xml  2>$(CHECKLOG)
 
 tidy: .clang-tidy
-	clang-tidy --extra-arg-before=-xc++ --format-style=file src/*
+	clang-tidy --extra-arg-before=-xc++ --format-style=file src/* test/* 
 
 clean :
 	rm -fr $(TESTS) gtest.a gtest_main.a *.o *.out.xml
