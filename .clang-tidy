@@ -1,0 +1,33 @@
+---
+Checks: '*,
+  -google-readability-todo,
+  -modernize-use-trailing-return-type,
+  -llvmlibc-*,
+  -llvm-header-guar*
+  '
+WarningsAsErrors: '*'
+HeaderFilterRegex: '.*'
+FormatStyle: none
+User: horolsky
+CheckOptions:
+  - { key: readability-identifier-naming.NamespaceCase, value: lower_case }
+
+  - { key: readability-identifier-naming.FunctionCase, value: lower_case }
+  - { key: readability-identifier-naming.ParameterCase, value: lower_case }
+  - { key: readability-identifier-naming.VariableCase, value: lower_case }
+
+  - { key: readability-identifier-naming.ClassCase, value: lower_case }
+  - { key: readability-identifier-naming.PrivateMemberCase, value: lower_case }
+  - { key: readability-identifier-naming.PrivateMemberPrefix, value: _ }
+  - { key: readability-identifier-naming.StructCase, value: lower_case }
+
+  - { key: readability-identifier-naming.TypeAliasCase, value: lower_case }
+  - { key: readability-identifier-naming.TypeTemplateParameterCase, value: CamelCase }
+  - { key: readability-identifier-naming.TypedefCase, value: lower_case }
+
+  - { key: readability-identifier-naming.ConstexprVariableCase, value: lower_case }
+  - { key: readability-identifier-naming.ConstexprVariablePrefix, value: k }
+  - { key: readability-identifier-naming.GlobalConstantCase, value: UPPER_CASE }
+  - { key: readability-identifier-naming.StaticConstantCase, value: UPPER_CASE }
+
+  - { key: google-runtime-int.TypeSuffix, value: _t }

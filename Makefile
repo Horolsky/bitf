@@ -9,7 +9,7 @@ GTEST_DIR = ../googletest/googletest
 endif
 
 CPPFLAGS += -isystem $(GTEST_DIR)/include
-CXXFLAGS += -g -std=gnu++14 -Wall -Wextra -pthread
+CXXFLAGS += -g -std=gnu++14 -Wall -Wextra -pedantic -pthread -fsanitize=address,undefined
 
 # add new tests here
 TESTS = bitf_gTest
@@ -29,8 +29,24 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 # House-keeping build targets.
 all : test
 
+format: .clang-format
+	clang-format -style=file src/*
+
+CPPCHECK = cppcheck
+CHECKFLAGS = -q --error-exitcode=1
+CHECKLOG = cppcheck.out.xml
+
+$(CHECKLOG): 
+	$(CPPCHECK) $(CHECKFLAGS) src/* --xml >$@
+
+check:
+	cppcheck --enable=all --verbose src/* --xml  2>$(CHECKLOG)
+
+tidy: .clang-tidy
+	clang-tidy --extra-arg-before=-xc++ --format-style=file src/*
+
 clean :
-	rm -fr $(TESTS) gtest.a gtest_main.a *.o
+	rm -fr $(TESTS) gtest.a gtest_main.a *.o *.out.xml
 
 # Builds gtest.a and gtest_main.a.
 
