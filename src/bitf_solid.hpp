@@ -6,9 +6,9 @@
 namespace bitf
 {
 /**
- * bitfields with generic scalar storage
+ * bitfields with generic unsigned integer storage
  */
-namespace scalar
+namespace solid
 {
 #define __GENERIC_UNSIGNED_T                                                  \
   template <typename T,                                                       \
@@ -231,7 +231,7 @@ public:
   virtual std::string
   to_str () const
   {
-    return scalar::to_str<T> (_bits);
+    return solid::to_str<T> (_bits);
   };
 };
 
@@ -246,7 +246,7 @@ public:
   constructor (T value, int index, T bits = 0)
   {
     data<T>::_bits
-        = scalar::insert<T> (value, index, bit_width<T> (value), bits);
+        = solid::insert<T> (value, index, bit_width<T> (value), bits);
   };
   /**
    * create bitfield with vector of atomic values
@@ -254,7 +254,7 @@ public:
    */
   constructor (std::vector<T> values, int index, size_t offset, T bits = 0)
   {
-    data<T>::_bits = scalar::insert<T> (values, index, offset, bits);
+    data<T>::_bits = solid::insert<T> (values, index, offset, bits);
   };
   virtual ~constructor () = default;
 };
@@ -266,19 +266,19 @@ public:
   virtual T
   get (int index, size_t offset) const
   {
-    return scalar::get<T> (data<T>::_bits, index, offset);
+    return solid::get<T> (data<T>::_bits, index, offset);
   };
   // get vector of n atomic values from bitdata
   virtual std::vector<T>
   get (int index, size_t offset, T n) const
   {
-    return scalar::get<T> (data<T>::_bits, index, offset, n);
+    return solid::get<T> (data<T>::_bits, index, offset, n);
   };
   // get single bit value by index
   virtual T
   operator[] (int index) const
   {
-    return scalar::get<T> (data<T>::_bits, index, 1);
+    return solid::get<T> (data<T>::_bits, index, 1);
   };
 };
 
@@ -296,17 +296,17 @@ public:
   virtual void
   insert (T value, int index, size_t offset)
   {
-    data<T>::_bits = scalar::insert<T> (value, index, offset, data<T>::_bits);
+    data<T>::_bits = solid::insert<T> (value, index, offset, data<T>::_bits);
   };
 
   // insert vector of atomic values to bitfield
   virtual void
   insert (std::vector<T> values, int index, size_t offset)
   {
-    data<T>::_bits = scalar::insert<T> (values, index, offset, data<T>::_bits);
+    data<T>::_bits = solid::insert<T> (values, index, offset, data<T>::_bits);
   };
 };
 
-} // namespace bitf::scalar
+} // namespace bitf::solid
 
 } // namespace bitf
