@@ -75,7 +75,7 @@ to_str (T bits)
 // get atomic value from bitdata
 __GENERIC_UNSIGNED_T
 T
-get (T bits, int index, size_t offset)
+get_scalar (T bits, int index, size_t offset)
 {
   index &= max_index (T);
   if (offset + index > bit_size (T))
@@ -89,7 +89,7 @@ get (T bits, int index, size_t offset)
 // get vector of n atomic values from bitdata
 __GENERIC_UNSIGNED_T
 std::vector<T>
-get (T bits, int index, size_t offset, size_t n)
+get_vector (T bits, int index, size_t offset, size_t n)
 {
   index &= max_index (T);
 
@@ -117,7 +117,7 @@ get (T bits, int index, size_t offset, size_t n)
 // insert atomic value to bitfield
 __GENERIC_UNSIGNED_T
 T
-insert (T value, int index, size_t offset, T bits = 0)
+insert_scalar (T value, int index, size_t offset, T bits = 0)
 {
   index &= max_index (T);
   if (offset + index > bit_size (T))
@@ -135,7 +135,7 @@ insert (T value, int index, size_t offset, T bits = 0)
 // insert vector of atomic values to bitfield
 __GENERIC_UNSIGNED_T
 T
-insert (std::vector<T> values, int index, size_t offset, T bits = 0)
+insert_vector (std::vector<T> values, int index, size_t offset, T bits = 0)
 {
   T n = values.size ();
   if (!n)
@@ -246,7 +246,7 @@ public:
   constructor (T value, int index, T bits = 0)
   {
     data<T>::_bits
-        = solid::insert<T> (value, index, bit_width<T> (value), bits);
+        = solid::insert_scalar<T> (value, index, bit_width<T> (value), bits);
   };
   /**
    * create bitfield with vector of atomic values
@@ -254,7 +254,7 @@ public:
    */
   constructor (std::vector<T> values, int index, size_t offset, T bits = 0)
   {
-    data<T>::_bits = solid::insert<T> (values, index, offset, bits);
+    data<T>::_bits = solid::insert_vector<T> (values, index, offset, bits);
   };
   virtual ~constructor () = default;
 };
@@ -264,21 +264,21 @@ __GENERIC_UNSIGNED_T class accessor : public virtual data<T>
 public:
   // get atomic value from bitdata
   virtual T
-  get (int index, size_t offset) const
+  get_scalar (int index, size_t offset) const
   {
-    return solid::get<T> (data<T>::_bits, index, offset);
+    return solid::get_scalar<T> (data<T>::_bits, index, offset);
   };
   // get vector of n atomic values from bitdata
   virtual std::vector<T>
-  get (int index, size_t offset, T n) const
+  get_vector (int index, size_t offset, T n) const
   {
-    return solid::get<T> (data<T>::_bits, index, offset, n);
+    return solid::get_vector<T> (data<T>::_bits, index, offset, n);
   };
   // get single bit value by index
   virtual T
   operator[] (int index) const
   {
-    return solid::get<T> (data<T>::_bits, index, 1);
+    return solid::get_scalar<T> (data<T>::_bits, index, 1);
   };
 };
 
@@ -294,16 +294,16 @@ public:
 
   // insert atomic value to bitfield
   virtual void
-  insert (T value, int index, size_t offset)
+  insert_scalar (T value, int index, size_t offset)
   {
-    data<T>::_bits = solid::insert<T> (value, index, offset, data<T>::_bits);
+    data<T>::_bits = solid::insert_scalar<T> (value, index, offset, data<T>::_bits);
   };
 
   // insert vector of atomic values to bitfield
   virtual void
-  insert (std::vector<T> values, int index, size_t offset)
+  insert_vector (std::vector<T> values, int index, size_t offset)
   {
-    data<T>::_bits = solid::insert<T> (values, index, offset, data<T>::_bits);
+    data<T>::_bits = solid::insert_vector<T> (values, index, offset, data<T>::_bits);
   };
 };
 

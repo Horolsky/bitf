@@ -12,7 +12,7 @@ uint8_t x{0b101011};
 cout << bitf::solid::to_str<uint8_t>(x) << endl;
 // expected output: "00101011"
 
-x = bitf::solid::insert<uint8_t>(
+x = bitf::solid::insert_scalar<uint8_t>(
     1,  // inserting bit '1'
     7,  // to position with index 7
     1,  // with bit offset 1
@@ -22,7 +22,7 @@ x = bitf::solid::insert<uint8_t>(
 cout << bitf::solid::to_str<uint8_t>(x) << endl;
 // expected output: "10101011"
 
-uint8_t bits = bitf::solid::get<uint8_t>(
+uint8_t bits = bitf::solid::get_scalar<uint8_t>(
     x,  // getting few bits as single value from bitfield source x
     3,  // from index 3
     3   // offset 3
@@ -45,7 +45,7 @@ public virtual bitf::solid::mutator<size_t>  // exclude mutator to get immutable
 };
 
 BitField x {};          // initialized to 0
-x.insert(
+x.insert_vector(
     {1,0,2,0,3},        // atomic bitwise data
     1,                  // starting index
     2                   // offset

@@ -63,27 +63,27 @@ TEST (func, util_str)
 
 TEST (func, get_value)
 {
-  EXPECT_EQ (solid::get<size_t> (0b10000101, 2, 1), 1);
-  EXPECT_EQ (solid::get<size_t> (0b10001000, 3, 1), 1);
+  EXPECT_EQ (solid::get_scalar<size_t> (0b10000101, 2, 1), 1);
+  EXPECT_EQ (solid::get_scalar<size_t> (0b10001000, 3, 1), 1);
 
   auto index = solid::max_index(size_t);
   auto left = 1UL << index;
-  EXPECT_EQ (solid::get<size_t> (left, index, 1), 1);
-  EXPECT_EQ (solid::get<size_t> (left, 0, index), 0);
+  EXPECT_EQ (solid::get_scalar<size_t> (left, index, 1), 1);
+  EXPECT_EQ (solid::get_scalar<size_t> (left, 0, index), 0);
 
   // offset test
-  EXPECT_EQ (solid::get<size_t> (0b10011100001, 0, 5), 0b1);
-  EXPECT_EQ (solid::get<size_t> (0b10011100001, 1, 4), 0b0);
-  EXPECT_EQ (solid::get<size_t> (0b10011100001, 5, 3), 0b111);
-  EXPECT_EQ (solid::get<size_t> (0b10011100001, 5, 4), 0b111);
-  EXPECT_EQ (solid::get<size_t> (0b10011100001, 5, 5), 0b111);
-  EXPECT_EQ (solid::get<size_t> (0b10011100001, 5, 6), 0b100111);
+  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001, 0, 5), 0b1);
+  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001, 1, 4), 0b0);
+  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001, 5, 3), 0b111);
+  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001, 5, 4), 0b111);
+  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001, 5, 5), 0b111);
+  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001, 5, 6), 0b100111);
 }
 TEST (func, get_vector)
 {
   auto check_vector
       = [] (size_t bits, int index, size_t offset, std::vector<size_t> &b) {
-          auto a = solid::get<size_t> (bits, index, offset, b.size ());
+          auto a = solid::get_vector<size_t> (bits, index, offset, b.size ());
           return std::equal (a.begin (), a.end (), b.begin ());
         };
 
@@ -107,15 +107,15 @@ TEST (func, get_vector)
 TEST (func, set_vector)
 {
   std::vector<size_t> vec_1{ 1, 0, 0, 0, 1, 0, 0, 0 };
-  auto val_1 = solid::insert<size_t> (vec_1, 0, 1, 0);
+  auto val_1 = solid::insert_vector<size_t> (vec_1, 0, 1, 0);
   EXPECT_EQ (val_1, 0b00010001);
 
   std::vector<size_t> vec_2{ 0, 1, 2, 3, 0, 1, 2, 3 };
-  auto val_2 = solid::insert<size_t> (vec_2, 0, 2, 0);
+  auto val_2 = solid::insert_vector<size_t> (vec_2, 0, 2, 0);
   EXPECT_EQ (val_2, 0b1110010011100100);
 
   std::vector<size_t> vec_3{ 7, 0, 6, 1, 5, 2, 4, 3 };
-  auto val_3 = solid::insert<size_t> (vec_3, 0, 3, 0);
+  auto val_3 = solid::insert_vector<size_t> (vec_3, 0, 3, 0);
   EXPECT_EQ (val_3, 0b011100010101001110000111);
 }
 
@@ -183,7 +183,7 @@ TEST (constructor, set_vector)
   BitF a{ vec, 0, 2 };
 
   bool equal = true;
-  auto ret_vec = a.get (0, 2, vec.size ());
+  auto ret_vec = a.get_vector (0, 2, vec.size ());
 
   for (size_t i = 0; i < vec.size (); i++)
     if (vec[i] != ret_vec[i])
@@ -207,11 +207,11 @@ TEST (constructor, vector_update)
 TEST (accessor, get_value)
 {
   BitF x1{ 0b10101 };
-  size_t a1 = x1.get (2, 1);
+  size_t a1 = x1.get_scalar (2, 1);
   EXPECT_EQ (a1, 0b1);
 
   BitF x2{ 0b10101 };
-  size_t a2 = x2.get (2, 3);
+  size_t a2 = x2.get_scalar (2, 3);
   EXPECT_EQ (a2, 0b101);
 
   BitF x3{ 0b10101 };
@@ -224,7 +224,7 @@ TEST (accessor, get_vector)
   BitF x{ 0b1100100001 };
   std::vector<size_t> vec{ 1, 0, 2, 0, 3 };
   bool equal = true;
-  auto ret_vec = x.get (0, 2, vec.size ());
+  auto ret_vec = x.get_vector (0, 2, vec.size ());
 
   for (size_t i = 0; i < vec.size (); i++)
     if (vec[i] != ret_vec[i])
@@ -247,28 +247,28 @@ TEST (mutator, set_zero)
 TEST (mutator, insert_1bit)
 {
   BitF x{ 0b10001 };
-  x.insert (1, 2, 1);
+  x.insert_scalar (1, 2, 1);
   EXPECT_EQ (x.bits (), 0b10101);
 }
 
 TEST (mutator, insert_3bits)
 {
   BitF x{ 0b10000001 };
-  x.insert (0b111, 3, 3);
+  x.insert_scalar (0b111, 3, 3);
   EXPECT_EQ (x.bits (), 0b10111001);
 }
 
 TEST (mutator, set_vector)
 {
   BitF x{ 0 };
-  x.insert ({ 1, 0, 2, 0, 3 }, 1, 2);
+  x.insert_vector ({ 1, 0, 2, 0, 3 }, 1, 2);
   auto bv = x.bits ();
   EXPECT_EQ (bv, 0b11001000010);
 }
 TEST (mutator, set_vector2)
 {
   BitF x{ 0b10000000 };
-  x.insert ({ 1, 2, 3 }, 0, 2);
+  x.insert_vector ({ 1, 2, 3 }, 0, 2);
   EXPECT_EQ (x.bits (), 0b10111001);
 }
 
