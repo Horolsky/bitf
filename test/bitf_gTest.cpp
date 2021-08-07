@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "scalar_cls.hpp"
+#include "bitf_scalar.hpp"
 #include "gtest/gtest.h"
 using namespace bitf;
 
