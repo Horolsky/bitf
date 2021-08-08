@@ -10,12 +10,17 @@ namespace bitf
  */
 namespace solid
 {
-#define __GENERIC_UNSIGNED_T                                                  \
+#define __GENERIC_UNSIGNED_TYPE(T)                                            \
   template <typename T,                                                       \
             std::enable_if_t<std::is_unsigned<T>::value, bool> = true>
 
+#define __GENERIC_UNSIGNED_TYPES(T1, T2)                                      \
+  template <typename T1, typename T2,                                         \
+            std::enable_if_t<std::is_unsigned<T1>::value, bool> = true,       \
+            std::enable_if_t<std::is_unsigned<T2>::value, bool> = true>
+
 // max value of bitfield storage type
-__GENERIC_UNSIGNED_T
+__GENERIC_UNSIGNED_TYPE (T)
 inline T
 max_value ()
 {
@@ -23,7 +28,7 @@ max_value ()
 }
 
 // number of stored bits
-__GENERIC_UNSIGNED_T
+__GENERIC_UNSIGNED_TYPE (T)
 inline size_t
 bit_size ()
 {
@@ -31,7 +36,7 @@ bit_size ()
 }
 
 // max bitfield index with offset = 1
-__GENERIC_UNSIGNED_T
+__GENERIC_UNSIGNED_TYPE (T)
 inline size_t
 max_index ()
 {
@@ -39,7 +44,7 @@ max_index ()
 }
 
 // number of bits needed to store value
-__GENERIC_UNSIGNED_T
+__GENERIC_UNSIGNED_TYPE (T)
 size_t
 bit_width (T value)
 {
@@ -56,7 +61,7 @@ bit_width (T value)
 #define max_index(T) max_index<T> ()
 
 // stringify binary representation of bitfield
-__GENERIC_UNSIGNED_T
+__GENERIC_UNSIGNED_TYPE (T)
 std::string
 to_str (T bits)
 {
@@ -73,7 +78,7 @@ to_str (T bits)
 }
 
 // get atomic value from bitdata
-__GENERIC_UNSIGNED_T
+__GENERIC_UNSIGNED_TYPE (T)
 T
 get_scalar (T bits, int index, size_t offset)
 {
@@ -87,7 +92,7 @@ get_scalar (T bits, int index, size_t offset)
 }
 
 // get vector of n atomic values from bitdata
-__GENERIC_UNSIGNED_T
+__GENERIC_UNSIGNED_TYPE (T)
 std::vector<T>
 get_vector (T bits, int index, size_t offset, size_t n)
 {
@@ -115,7 +120,7 @@ get_vector (T bits, int index, size_t offset, size_t n)
 }
 
 // insert atomic value to bitfield
-__GENERIC_UNSIGNED_T
+__GENERIC_UNSIGNED_TYPE (T)
 T
 insert_scalar (T value, int index, size_t offset, T bits = 0)
 {
@@ -133,7 +138,7 @@ insert_scalar (T value, int index, size_t offset, T bits = 0)
 }
 
 // insert vector of atomic values to bitfield
-__GENERIC_UNSIGNED_T
+__GENERIC_UNSIGNED_TYPE (T)
 T
 insert_vector (std::vector<T> values, int index, size_t offset, T bits = 0)
 {
@@ -183,7 +188,7 @@ insert_vector (std::vector<T> values, int index, size_t offset, T bits = 0)
   return bits;
 }
 
-__GENERIC_UNSIGNED_T class data
+__GENERIC_UNSIGNED_TYPE (T) class data
 {
 protected:
   T _bits;
@@ -235,7 +240,7 @@ public:
   };
 };
 
-__GENERIC_UNSIGNED_T class constructor : public virtual data<T>
+__GENERIC_UNSIGNED_TYPE (T) class constructor : public virtual data<T>
 {
 public:
   using data<T>::data;
@@ -259,7 +264,7 @@ public:
   virtual ~constructor () = default;
 };
 
-__GENERIC_UNSIGNED_T class accessor : public virtual data<T>
+__GENERIC_UNSIGNED_TYPE (T) class accessor : public virtual data<T>
 {
 public:
   // get atomic value from bitdata
@@ -282,7 +287,7 @@ public:
   };
 };
 
-__GENERIC_UNSIGNED_T class mutator : public virtual data<T>
+__GENERIC_UNSIGNED_TYPE (T) class mutator : public virtual data<T>
 {
 public:
   // set bits value
@@ -296,14 +301,16 @@ public:
   virtual void
   insert_scalar (T value, int index, size_t offset)
   {
-    data<T>::_bits = solid::insert_scalar<T> (value, index, offset, data<T>::_bits);
+    data<T>::_bits
+        = solid::insert_scalar<T> (value, index, offset, data<T>::_bits);
   };
 
   // insert vector of atomic values to bitfield
   virtual void
   insert_vector (std::vector<T> values, int index, size_t offset)
   {
-    data<T>::_bits = solid::insert_vector<T> (values, index, offset, data<T>::_bits);
+    data<T>::_bits
+        = solid::insert_vector<T> (values, index, offset, data<T>::_bits);
   };
 };
 

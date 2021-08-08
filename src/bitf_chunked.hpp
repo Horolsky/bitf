@@ -13,12 +13,7 @@ namespace bitf
 namespace chunked
 {
 
-#define __GENERIC_UNSIGNED_SCALAR_T                                           \
-  template <typename ChunkT, typename ScalarT,                                \
-            std::enable_if_t<std::is_unsigned<ChunkT>::value, bool> = true,   \
-            std::enable_if_t<std::is_unsigned<ScalarT>::value, bool> = true>
-
-__GENERIC_UNSIGNED_T
+__GENERIC_UNSIGNED_TYPE(T)
 std::string
 to_str (const T *const chunks, size_t n)
 {
@@ -43,7 +38,7 @@ to_str (const T *const chunks, size_t n)
  * max offset = 64
  * TODO: template with params for chunk and return val
  */
-__GENERIC_UNSIGNED_SCALAR_T
+__GENERIC_UNSIGNED_TYPES(ChunkT, ScalarT) 
 ScalarT
 get_scalar (ChunkT const *chunks, size_t n, int index, const size_t offset)
 {
@@ -111,7 +106,7 @@ struct _static
  * dynamic bitdata storage struct
  * T: chunk type, unsigned integer only
  */
-__GENERIC_UNSIGNED_T
+__GENERIC_UNSIGNED_TYPE(T)
 struct _dynamic
 {
   std::vector<T> _data{};
