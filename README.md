@@ -1,12 +1,12 @@
 # BITF
 
 flexible generic bitfields
-__
+___
 
 ## SOLID BITFIELDS
 namespace **bitf::solid** contains pure generic functions for granular bitwise operations on unsigned integers and OOP wrappers on it
 
-## pure functions example
+### pure functions example
 ```c++
 uint8_t x{0b101011};
 cout << bitf::solid::to_str<uint8_t>(x) << endl;
@@ -32,7 +32,7 @@ cout << bitf::solid::to_str<uint8_t>(bits) << endl;
 // expected output: "00000101"                    
 ```
     
-## example of class design and usage
+### example of class design and usage
 ```c++
 class BitField :
 public virtual bitf::solid::data<size_t>,
@@ -53,3 +53,6 @@ x.insert_vector(
     
 cout << x.to_str();     // expect to print '11001000010'
 ```
+## CHUNKED BITFIELDS
+namespace **bitf::chunked** extends granular functionality on generic chunked storage types with both fixed and dynamic size  
+*work in progress* 
