@@ -1,6 +1,6 @@
 #include "gtest_solid_func.hpp"
 #include "gtest_solid_cls.hpp"
-// #include "gtest_chunked.hpp"
+#include "gtest_chunked_func.hpp"
 
 int
 main (int argc, char **argv)
