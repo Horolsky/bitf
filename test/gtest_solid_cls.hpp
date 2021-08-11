@@ -1,9 +1,10 @@
 #pragma once
-#include <algorithm>
-#include <vector>
 
 #include "bitf_solid.hpp"
 #include "gtest/gtest.h"
+
+#include <vector>
+
 using namespace bitf;
 
 // test class
@@ -18,39 +19,39 @@ public:
 
 #pragma region TEST_DATA
 
-TEST (data, init_def)
+TEST (solid_data, init_def)
 {
   BitF x{};
   EXPECT_EQ (x.bits (), 0b0);
 }
 
-TEST (data, init_zero)
+TEST (solid_data, init_zero)
 {
   BitF x{ 0 };
   EXPECT_EQ (x.bits (), 0b0);
 }
 
-TEST (data, init_max)
+TEST (solid_data, init_max)
 {
-  BitF x{ solid::max_value<size_t>() };
-  EXPECT_EQ (x.bits (), solid::max_value<size_t>());
+  BitF x{ solid::max_value<size_t> () };
+  EXPECT_EQ (x.bits (), solid::max_value<size_t> ());
 }
 
-TEST (data, copy_constructor)
+TEST (solid_data, copy_constructor)
 {
   BitF a{ 474434687 };
   BitF b = a;
   EXPECT_EQ (a.bits (), b.bits ());
 }
 
-TEST (data, assignment)
+TEST (solid_data, assignment)
 {
   BitF a{ 474434687 };
   BitF b{ 0 };
   b = a;
   EXPECT_EQ (a.bits (), b.bits ());
 }
-TEST (data, comparison)
+TEST (solid_data, comparison)
 {
   BitF a{ 474434687 };
   BitF b{ 0 };
@@ -63,7 +64,7 @@ TEST (data, comparison)
 
 #pragma region TEST_CONSTRUCTOR
 
-TEST (constructor, update_bits)
+TEST (solid_constructor, update_bits)
 {
   size_t bits = 0b101010;
 
@@ -72,7 +73,7 @@ TEST (constructor, update_bits)
   EXPECT_EQ (x.bits (), 0b101011);
 }
 
-TEST (constructor, set_vector)
+TEST (solid_constructor, set_vector)
 {
   std::vector<size_t> vec{ 1, 0, 2, 0, 3 };
   BitF a{ vec, 0, 2 };
@@ -87,7 +88,7 @@ TEST (constructor, set_vector)
   EXPECT_EQ (equal, true);
 }
 
-TEST (constructor, vector_update)
+TEST (solid_constructor, vector_update)
 {
   size_t bits = 0b10000000;
   std::vector<size_t> vec{ 1, 2, 3 };
@@ -99,7 +100,7 @@ TEST (constructor, vector_update)
 
 #pragma region TEST_ACCESSOR
 
-TEST (accessor, get_value)
+TEST (solid_accessor, get_scalar)
 {
   BitF x1{ 0b10101 };
   size_t a1 = x1.get_scalar (2, 1);
@@ -114,7 +115,7 @@ TEST (accessor, get_value)
   EXPECT_EQ (a3, 0b1);
 }
 
-TEST (accessor, get_vector)
+TEST (solid_accessor, get_vector)
 {
   BitF x{ 0b1100100001 };
   std::vector<size_t> vec{ 1, 0, 2, 0, 3 };
@@ -132,39 +133,37 @@ TEST (accessor, get_vector)
 
 #pragma region TEST_MUTATOR
 
-TEST (mutator, set_zero)
+TEST (solid_mutator, set_zero)
 {
   BitF x{ 243387867 };
   x.set (0);
   EXPECT_EQ (x.bits (), 0b0);
 }
 
-TEST (mutator, insert_1bit)
+TEST (solid_mutator, insert_1bit)
 {
   BitF x{ 0b10001 };
   x.insert_scalar (1, 2, 1);
   EXPECT_EQ (x.bits (), 0b10101);
 }
 
-TEST (mutator, insert_3bits)
+TEST (solid_mutator, insert_3bits)
 {
   BitF x{ 0b10000001 };
   x.insert_scalar (0b111, 3, 3);
   EXPECT_EQ (x.bits (), 0b10111001);
 }
 
-TEST (mutator, set_vector)
+TEST (solid_mutator, set_vector)
 {
   BitF x{ 0 };
   x.insert_vector ({ 1, 0, 2, 0, 3 }, 1, 2);
   auto bv = x.bits ();
   EXPECT_EQ (bv, 0b11001000010);
-}
-TEST (mutator, set_vector2)
-{
-  BitF x{ 0b10000000 };
-  x.insert_vector ({ 1, 2, 3 }, 0, 2);
-  EXPECT_EQ (x.bits (), 0b10111001);
+
+  BitF y{ 0b10000000 };
+  y.insert_vector ({ 1, 2, 3 }, 0, 2);
+  EXPECT_EQ (y.bits (), 0b10111001);
 }
 
 #pragma endregion

@@ -1,33 +1,35 @@
 #pragma once
-#include <algorithm>
-#include <vector>
+
 #include "bitf_solid.hpp"
 #include "gtest/gtest.h"
+
+#include <vector>
+
 using namespace bitf;
 
 #pragma region TEST_FUNC_CONST
 
-TEST (func, const_bit_size)
+TEST (solid_func, bit_size)
 {
-  auto s_uc = solid::bit_size<unsigned char>();
+  auto s_uc = solid::bit_size<unsigned char> ();
   EXPECT_EQ (s_uc, sizeof (unsigned char) << 0b11);
 
-  auto s_ud = solid::bit_size<unsigned int>();
+  auto s_ud = solid::bit_size<unsigned int> ();
   EXPECT_EQ (s_ud, sizeof (unsigned int) << 0b11);
 
-  auto s_ul = solid::bit_size<size_t>();
+  auto s_ul = solid::bit_size<size_t> ();
   EXPECT_EQ (s_ul, sizeof (size_t) << 0b11);
 }
 
-TEST (func, const_max_value)
+TEST (solid_func, max_value)
 {
-  auto max_uc = solid::max_value<unsigned char>();
+  auto max_uc = solid::max_value<unsigned char> ();
   EXPECT_EQ (max_uc, 255);
 
-  auto max_ud = solid::max_value<unsigned int>();
+  auto max_ud = solid::max_value<unsigned int> ();
   EXPECT_EQ (max_ud, ~0U);
 
-  auto max_ul = solid::max_value<size_t>();
+  auto max_ul = solid::max_value<size_t> ();
   EXPECT_EQ (max_ul, ~0UL);
 }
 
@@ -35,28 +37,28 @@ TEST (func, const_max_value)
 
 #pragma region TEST_FUNC_UTILS
 
-TEST (func, util_nofbits)
+TEST (solid_func, util_nofbits)
 {
-  EXPECT_EQ (solid::bit_width<size_t>(0b10101), 5);
-  EXPECT_EQ (solid::bit_width<size_t>(0b1000100010001000), 16);
+  EXPECT_EQ (solid::bit_width<size_t> (0b10101), 5);
+  EXPECT_EQ (solid::bit_width<size_t> (0b1000100010001000), 16);
 }
 
-TEST (func, util_str)
+TEST (solid_func, util_str)
 {
-  EXPECT_EQ (solid::to_str<unsigned char>(0b1010), "00001010");
-  EXPECT_EQ (solid::to_str<unsigned char>(255), "11111111");
+  EXPECT_EQ (solid::to_str<unsigned char> (0b1010), "00001010");
+  EXPECT_EQ (solid::to_str<unsigned char> (255), "11111111");
 }
 
 #pragma endregion
 
 #pragma region TEST_FUNC_GETTERS
 
-TEST (func, get_value)
+TEST (solid_func, get_scalar)
 {
   EXPECT_EQ (solid::get_scalar<size_t> (0b10000101, 2, 1), 1);
   EXPECT_EQ (solid::get_scalar<size_t> (0b10001000, 3, 1), 1);
 
-  auto index = solid::max_index<size_t>();
+  auto index = solid::max_index<size_t> ();
   auto left = 1UL << index;
   EXPECT_EQ (solid::get_scalar<size_t> (left, index, 1), 1);
   EXPECT_EQ (solid::get_scalar<size_t> (left, 0, index), 0);
@@ -69,7 +71,7 @@ TEST (func, get_value)
   EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001, 5, 5), 0b111);
   EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001, 5, 6), 0b100111);
 }
-TEST (func, get_vector)
+TEST (solid_func, get_vector)
 {
   auto check_vector
       = [] (size_t bits, int index, size_t offset, std::vector<size_t> &b) {
@@ -94,7 +96,7 @@ TEST (func, get_vector)
 
 #pragma region TEST_FUNC_SETTERS
 
-TEST (func, set_vector)
+TEST (solid_func, set_vector)
 {
   std::vector<size_t> vec_1{ 1, 0, 0, 0, 1, 0, 0, 0 };
   auto val_1 = solid::insert_vector<size_t> (vec_1, 0, 1, 0);
