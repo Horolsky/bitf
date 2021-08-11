@@ -57,16 +57,12 @@ bit_width (T value)
   return n;
 }
 
-#define max_value(T) max_value<T> ()
-#define bit_size(T) bit_size<T> ()
-#define max_index(T) max_index<T> ()
-
 // stringify binary representation of bitfield
 __GENERIC_UNSIGNED_TYPE (T)
 std::string
 to_str (T bits)
 {
-  size_t size = bit_size (T);
+  size_t size = bit_size<T> ();
   std::string res (size, '0');
   for (size_t i = 0; i < size; i++)
     {
@@ -83,12 +79,12 @@ __GENERIC_UNSIGNED_TYPE (T)
 T
 get_scalar (T bits, int index, size_t offset)
 {
-  index &= max_index (T);
-  if (offset + index > bit_size (T))
+  index &= max_index<T> ();
+  if (offset + index > bit_size<T> ())
     {
       throw std::overflow_error ("offset + index > BITSIZE");
     }
-  T offsetmask = max_value (T) >> (bit_size (T) - offset);
+  T offsetmask = max_value<T> () >> (bit_size<T> () - offset);
   return (bits >> index) & offsetmask;
 }
 
@@ -97,17 +93,17 @@ __GENERIC_UNSIGNED_TYPE (T)
 std::vector<T>
 get_vector (T bits, int index, size_t offset, size_t n)
 {
-  index &= max_index (T);
+  index &= max_index<T> ();
 
-  if (offset + index > bit_size (T))
+  if (offset + index > bit_size<T> ())
     {
       throw std::overflow_error ("offset + index > BITSIZE");
     }
-  size_t maxn = (bit_size (T) - index) / offset;
+  size_t maxn = (bit_size<T> () - index) / offset;
   n = n > maxn ? maxn : n;
 
   std::vector<T> res{};
-  T offsetmask = max_value (T) >> (bit_size (T) - offset);
+  T offsetmask = max_value<T> () >> (bit_size<T> () - offset);
 
   for (size_t i = 0; i < n; i++)
     {
@@ -125,12 +121,12 @@ __GENERIC_UNSIGNED_TYPE (T)
 T
 insert_scalar (T value, int index, size_t offset, T bits = 0)
 {
-  index &= max_index (T);
-  if (offset + index > bit_size (T))
+  index &= max_index<T> ();
+  if (offset + index > bit_size<T> ())
     {
       throw std::overflow_error ("offset + index > BITSIZE");
     }
-  T offsetmask = max_value (T) >> (bit_size (T) - (offset + index));
+  T offsetmask = max_value<T> () >> (bit_size<T> () - (offset + index));
   T indexmask = offsetmask >> offset;
   T mask = ~(offsetmask ^ indexmask);
   bits &= mask;
@@ -149,13 +145,13 @@ insert_vector (std::vector<T> values, int index, size_t offset, T bits = 0)
       return bits;
     }
 
-  index &= max_index (T);
-  if (offset + index > bit_size (T))
+  index &= max_index<T> ();
+  if (offset + index > bit_size<T> ())
     {
       throw std::overflow_error ("offset + index > BITSIZE");
     }
 
-  T maxn = (bit_size (T) - index) / offset;
+  T maxn = (bit_size<T> () - index) / offset;
   if (n > maxn)
     {
       throw std::overflow_error ("vector size > bitfield size");
@@ -176,7 +172,7 @@ insert_vector (std::vector<T> values, int index, size_t offset, T bits = 0)
       throw std::overflow_error ("vector value > offset");
     }
 
-  T offsetmask = max_value (T) >> (bit_size (T) - (offset * n + index));
+  T offsetmask = max_value<T> () >> (bit_size<T> () - (offset * n + index));
   T indexmask = offsetmask >> (offset * n);
   T mask = ~(offsetmask ^ indexmask);
   bits &= mask;
