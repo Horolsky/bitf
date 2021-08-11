@@ -11,9 +11,6 @@ endif
 CPPFLAGS += -isystem $(GTEST_DIR)/include
 CXXFLAGS += -g -std=gnu++14 -Wall -Wextra -pedantic -pthread -fsanitize=address,undefined
 
-# add new tests here
-TESTS = bitf_gTest
-
 SOURCE_DIR = src
 # LIB_DIR = lib
 TEST_DIR = test
@@ -46,7 +43,7 @@ tidy: .clang-tidy
 	clang-tidy --extra-arg-before=-xc++ --format-style=file src/* test/* 
 
 clean :
-	rm -fr $(TESTS) gtest.a gtest_main.a *.o *.out.xml
+	rm -fr gtest_entry gtest.a gtest_main.a *.o *.out.xml
 
 # Builds gtest.a and gtest_main.a.
 
@@ -66,12 +63,12 @@ gtest.a : gtest-all.o
 gtest_main.a : gtest-all.o gtest_main.o
 	$(AR) $(ARFLAGS) $@ $^
 
-bitf_gTest.o : $(TEST_DIR)/bitf_gTest.cpp $(SOURCE_DIR)/*.hpp $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) -I$(SOURCE_DIR) $(CXXFLAGS) -c $(TEST_DIR)/bitf_gTest.cpp
+gtest_entry.o : $(TEST_DIR)/gtest_entry.cpp $(TEST_DIR)/*.hpp $(SOURCE_DIR)/*.hpp $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) -I$(SOURCE_DIR) $(CXXFLAGS) -c $(TEST_DIR)/gtest_entry.cpp
 
-$(TESTS) : bitf_gTest.o gtest_main.a
+gtest_entry : gtest_entry.o gtest_main.a
 	@echo "Building $@ for $(KERNEL_NAME) $(MACHINE_NAME)"
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ -L. 
 
-test: $(TESTS)
-	./$(TESTS)
+test: gtest_entry
+	./gtest_entry
