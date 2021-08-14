@@ -158,7 +158,7 @@ collect (It start, It end, BitT bits, size_t offset = 1, int index = 0)
 // insert atomic value to bitfield
 template <class T, class BitT>
 BitT
-insert_scalar (T value, int index, size_t offset, BitT bits = 0)
+insert (T value, int index, size_t offset, BitT bits = 0)
 {
   __BITF_ASSERT_UNSIGNED (BitT);
   __BITF_ASSERT_INTEGRAL (T);
@@ -181,10 +181,10 @@ insert_scalar (T value, int index, size_t offset, BitT bits = 0)
   return bits;
 }
 
-// fill bitfield from container
+// update bitfield with generic container
 template <class It, class BitT = size_t>
 BitT
-fill (It start, It end, BitT bits = 0UL, size_t offset = 1, int index = 0)
+update (It start, It end, BitT bits = 0UL, size_t offset = 1, int index = 0)
 {
   __BITF_ASSERT_ITERATOR(It);
   using T = __BITF_VALUE_TYPE_OF(*start);
@@ -305,7 +305,7 @@ public:
   constructor (T value, int index, B bits = 0UL)
   {
     data<B>::_bits
-        = solid::insert_scalar<T> (value, index, bit_size<T> (value), bits);
+        = solid::insert<T> (value, index, bit_size<T> (value), bits);
   };
   /**
    * create bitfield with vector of atomic values
@@ -313,7 +313,7 @@ public:
    */
   constructor (std::vector<T> values, int index, size_t offset, B bits = 0UL)
   {
-    data<B>::_bits = solid::fill(values.begin(), values.end(), (B) bits, offset, index);
+    data<B>::_bits = solid::update(values.begin(), values.end(), (B) bits, offset, index);
   };
   virtual ~constructor () = default;
 };
@@ -355,17 +355,17 @@ public:
 
   // insert atomic value to bitfield
   virtual void
-  insert_scalar (T value, int index, size_t offset)
+  insert (T value, int index, size_t offset)
   {
     data<B>::_bits
-        = solid::insert_scalar<T> (value, index, offset, data<B>::_bits);
+        = solid::insert<T> (value, index, offset, data<B>::_bits);
   };
 
   // insert vector of atomic values to bitfield
   virtual void
   insert_vector (std::vector<T> values, int index, size_t offset)
   {
-    data<B>::_bits = solid::fill(values.begin(), values.end(), data<B>::_bits,offset, index);
+    data<B>::_bits = solid::update(values.begin(), values.end(), data<B>::_bits,offset, index);
   };
 };
 

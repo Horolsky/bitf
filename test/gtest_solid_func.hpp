@@ -101,19 +101,19 @@ TEST (solid_func, collect)
 TEST (solid_func, fill_zero)
 {
   std::vector<size_t> vec_1{ 1, 0, 0, 0, 1, 0, 0, 0 };
-  auto val_1 = solid::fill(vec_1.begin(), vec_1.end());
+  auto val_1 = solid::update(vec_1.begin(), vec_1.end());
   EXPECT_EQ (val_1, 0b00010001);
 
   std::vector<size_t> vec_2{ 0, 1, 2, 3, 0, 1, 2, 3 };
-  auto val_2 = solid::fill(vec_2.begin(), vec_2.end(), 0UL, 2);
+  auto val_2 = solid::update(vec_2.begin(), vec_2.end(), 0UL, 2);
   EXPECT_EQ (val_2, 0b1110010011100100);
 
   std::vector<size_t> vec_3{ 7, 0, 6, 1, 5, 2, 4, 3 };
-  auto val_3 = solid::fill(vec_3.begin(), vec_3.end(), 0UL, 3);
+  auto val_3 = solid::update(vec_3.begin(), vec_3.end(), 0UL, 3);
   EXPECT_EQ (val_3, 0b011100010101001110000111);
 
   int raw_arr[8] { 7, 0, 6, 1, 5, 2, 4, 3 };
-  auto val_4 = solid::fill(raw_arr, raw_arr+8, 0UL, 3);
+  auto val_4 = solid::update(raw_arr, raw_arr+8, 0UL, 3);
   EXPECT_EQ (val_4, 0b011100010101001110000111);
 }
 
@@ -122,22 +122,22 @@ TEST (solid_func, fill_update)
   const size_t BITS = bitf::solid::max_value<size_t>();
   size_t bits1  = (BITS << 8) | 0b00010001UL;
   std::vector<size_t> vec_1{ 1, 0, 0, 0, 1, 0, 0, 0 };
-  auto val_1 = solid::fill(vec_1.begin(), vec_1.end(), BITS);
+  auto val_1 = solid::update(vec_1.begin(), vec_1.end(), BITS);
   EXPECT_EQ (val_1, bits1);
 
   size_t bits2  = (BITS << 16) | 0b1110010011100100UL;
   std::vector<size_t> vec_2{ 0, 1, 2, 3, 0, 1, 2, 3 };
-  auto val_2 = solid::fill(vec_2.begin(), vec_2.end(), BITS, 2);
+  auto val_2 = solid::update(vec_2.begin(), vec_2.end(), BITS, 2);
   EXPECT_EQ (val_2, bits2);
 
   size_t bits3  = (BITS << 24) | 0b011100010101001110000111UL;
   std::vector<size_t> vec_3{ 7, 0, 6, 1, 5, 2, 4, 3 };
-  auto val_3 = solid::fill(vec_3.begin(), vec_3.end(), BITS, 3);
+  auto val_3 = solid::update(vec_3.begin(), vec_3.end(), BITS, 3);
   EXPECT_EQ (val_3, bits3);
 
   size_t bits4  = (BITS << 24) | 0b011100010101001110000111UL;
   int raw_arr[8] { 7, 0, 6, 1, 5, 2, 4, 3 };
-  auto val_4 = solid::fill(raw_arr, raw_arr+8, BITS, 3);
+  auto val_4 = solid::update(raw_arr, raw_arr+8, BITS, 3);
   EXPECT_EQ (val_4, bits4);
 }
 

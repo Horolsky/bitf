@@ -143,14 +143,14 @@ TEST (solid_mutator, set_zero)
 TEST (solid_mutator, insert_1bit)
 {
   BitF x{ 0b10001 };
-  x.insert_scalar (1, 2, 1);
+  x.insert (1, 2, 1);
   EXPECT_EQ (x.bits (), 0b10101);
 }
 
 TEST (solid_mutator, insert_3bits)
 {
   BitF x{ 0b10000001 };
-  x.insert_scalar (0b111, 3, 3);
+  x.insert (0b111, 3, 3);
   EXPECT_EQ (x.bits (), 0b10111001);
 }
 
