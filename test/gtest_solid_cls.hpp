@@ -8,13 +8,13 @@
 using namespace bitf;
 
 // test class
-class BitF : public virtual solid::data<size_t>,
-             public virtual solid::constructor<size_t>,
-             public virtual solid::accessor<size_t>,
-             public virtual solid::mutator<size_t>
+class BitF : public virtual solid::cls::data<size_t>,
+             public virtual solid::cls::constructor<size_t>,
+             public virtual solid::cls::accessor<size_t>,
+             public virtual solid::cls::mutator<size_t>
 {
 public:
-  using solid::constructor<size_t>::constructor;
+  using solid::cls::constructor<size_t>::constructor;
 };
 
 #pragma region TEST_DATA

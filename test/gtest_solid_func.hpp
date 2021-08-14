@@ -45,8 +45,8 @@ TEST (solid_func, util_nofbits)
 
 TEST (solid_func, util_str)
 {
-  EXPECT_EQ (solid::to_str<unsigned char> (0b1010), "00001010");
-  EXPECT_EQ (solid::to_str<unsigned char> (255), "11111111");
+  EXPECT_EQ (solid::to_string<unsigned char> (0b1010), "00001010");
+  EXPECT_EQ (solid::to_string<unsigned char> (255), "11111111");
 }
 
 #pragma endregion
@@ -101,7 +101,7 @@ TEST (solid_func, collect)
 TEST (solid_func, fill_zero)
 {
   std::vector<size_t> vec_1{ 1, 0, 0, 0, 1, 0, 0, 0 };
-  auto val_1 = solid::update(vec_1.begin(), vec_1.end());
+  auto val_1 = solid::update(vec_1.begin(), vec_1.end(), 0UL);
   EXPECT_EQ (val_1, 0b00010001);
 
   std::vector<size_t> vec_2{ 0, 1, 2, 3, 0, 1, 2, 3 };

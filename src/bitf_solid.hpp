@@ -75,8 +75,8 @@ max_index ()
   return (sizeof (T) << 0b11) - 1;
 }
 
-// number of bits needed to store value
-template <class T = size_t>
+// number of bits needed to store the value
+template <class T>
 size_t
 bit_size (T value)
 {
@@ -90,9 +90,9 @@ bit_size (T value)
 }
 
 // stringify binary representation of bitfield
-template <class T = size_t>
+template <class T>
 std::string
-to_str (T bits)
+to_string (T bits)
 {
   __BITF_ASSERT_UNSIGNED (T);
   size_t size = bit_capacity<T> ();
@@ -108,7 +108,7 @@ to_str (T bits)
 }
 
 // get atomic value from bitdata
-template <class T, class BitT = size_t>
+template <class T, class BitT>
 T
 get_scalar (BitT bits, int index, size_t offset)
 {
@@ -128,7 +128,7 @@ get_scalar (BitT bits, int index, size_t offset)
   return (T)(bits >> index) & offsetmask;
 }
 
-template <class It, class BitT = size_t>
+template <class It, class BitT>
 void
 collect (It start, It end, BitT bits, size_t offset = 1, int index = 0)
 {
@@ -182,9 +182,9 @@ insert (T value, int index, size_t offset, BitT bits = 0)
 }
 
 // update bitfield with generic container
-template <class It, class BitT = size_t>
+template <class It, class BitT>
 BitT
-update (It start, It end, BitT bits = 0UL, size_t offset = 1, int index = 0)
+update (It start, It end, BitT bits, size_t offset = 1, int index = 0)
 {
   __BITF_ASSERT_ITERATOR(It);
   using T = __BITF_VALUE_TYPE_OF(*start);
@@ -241,6 +241,9 @@ update (It start, It end, BitT bits = 0UL, size_t offset = 1, int index = 0)
   return bits;
 }
 
+namespace cls
+{
+  
 template <class T> class data
 {
 protected:
@@ -288,9 +291,9 @@ public:
 
   // stringify binary representation of bitfield
   virtual std::string
-  to_str () const
+  to_string () const
   {
-    return solid::to_str<T> (_bits);
+    return solid::to_string<T> (_bits);
   };
 };
 
@@ -368,6 +371,8 @@ public:
     data<B>::_bits = solid::update(values.begin(), values.end(), data<B>::_bits,offset, index);
   };
 };
+
+} // namespace bitf::solid::cls
 
 } // namespace bitf::solid
 
