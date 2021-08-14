@@ -143,26 +143,26 @@ TEST (solid_mutator, set_zero)
 TEST (solid_mutator, insert_1bit)
 {
   BitF x{ 0b10001 };
-  x.insert (1, 2, 1);
+  x.set_scalar (2, 1, 1);
   EXPECT_EQ (x.bits (), 0b10101);
 }
 
 TEST (solid_mutator, insert_3bits)
 {
   BitF x{ 0b10000001 };
-  x.insert (0b111, 3, 3);
+  x.set_scalar (3, 3, 0b111);
   EXPECT_EQ (x.bits (), 0b10111001);
 }
 
 TEST (solid_mutator, set_vector)
 {
   BitF x{ 0UL };
-  x.insert_vector ({ 1, 0, 2, 0, 3 }, 1, 2);
+  x.set_vector (1, 2, { 1, 0, 2, 0, 3 });
   auto bv = x.bits ();
   EXPECT_EQ (bv, 0b11001000010);
 
   BitF y{ 0b10000000 };
-  y.insert_vector ({ 1, 2, 3 }, 0, 2);
+  y.set_vector (0, 2, { 1, 2, 3 });
   EXPECT_EQ (y.bits (), 0b10111001);
 }
 

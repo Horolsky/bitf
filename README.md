@@ -9,14 +9,14 @@ namespace **bitf::solid** contains generic functions for granular bitwise operat
 ### pure functions example
 ```c++
 uint8_t a{0b101011};
-cout << bitf::solid::to_str<uint8_t>(a) << endl;
+cout << bitf::solid::to_string<uint8_t>(a) << endl;
 // expected output: "00101011"
 
-a = bitf::solid::insert<uint8_t>(
-    1,  // inserting bit '1'
-    7,  // to position with index 7
+a = bitf::solid::set_scalar<uint8_t>(
+    a   // to bitfield target x 
+    7,  // on index 7
     1,  // with bit offset 1
-    a   // to bitfield target x (default to 0)
+    1,  // insert value 1
     ); 
 
 // expected value of a: 0b10101011
@@ -31,7 +31,7 @@ int scalar = bitf::solid::get_scalar<int>(
 
 // generic update, 
 std::vector<int> vec { 7, 0, 6, 1, 5, 2, 4, 3 };
-size_t bits = solid::update(
+size_t bits = solid::set_bulk(
     vec_3.begin(),  // starting iterator
     vec_3.end(),    // ending iterator
     0UL,            // target bits
@@ -41,8 +41,17 @@ size_t bits = solid::update(
 
 //same generic function with raw arrays
 int raw_arr[8] { 7, 0, 6, 1, 5, 2, 4, 3 };
-size_t val_4 = solid::update(raw_arr, raw_arr+8, 0UL, 3);
+size_t val_4 = solid::set_bulk(raw_arr, raw_arr+8, 0UL, 3);
 // expected value of bits: 0b011100010101001110000111
+int bucket[4];
+solid::get_bulk(
+    bucket,         // starting iterator
+    bucket+4,       // ending iterator
+    val_4,          // target bits
+    3,              // offset
+    2               // index (bitwise, not offset)
+    );
+// expected value of bucket: { 2, 3, 4, 1 }
 ```
     
 ### example of class design and usage
@@ -58,13 +67,13 @@ public virtual bitf::solid::mutator<size_t>  // exclude mutator to get immutable
 };
 
 BitField x {};          // initialized to 0
-x.insert(
-    {1,0,2,0,3},        // atomic bitwise data
-    1,                  // starting index
-    2                   // offset
-    );                  // x value now equal to 0b11001000010
+x.set_vector(
+    1,                  // to index
+    2                   // with offset
+    {1,0,2,0,3},        // insert data
+    );                  
+// expected value of x.bits(): 0b11001000010
     
-cout << x.to_str();     // expect to print '11001000010'
 ```
 ## CHUNKED BITFIELDS
 namespace **bitf::chunked** extends granular functionality on generic chunked storage types with both fixed and dynamic size  

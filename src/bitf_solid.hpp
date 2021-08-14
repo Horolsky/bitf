@@ -110,7 +110,7 @@ to_string (T bits)
 // get atomic value from bitdata
 template <class T, class BitT>
 T
-get_scalar (BitT bits, int index, size_t offset)
+get_scalar (BitT bits, int index, size_t offset = 1)
 {
   __BITF_ASSERT_UNSIGNED (BitT);
   __BITF_ASSERT_INTEGRAL (T);
@@ -130,7 +130,7 @@ get_scalar (BitT bits, int index, size_t offset)
 
 template <class It, class BitT>
 void
-collect (It start, It end, BitT bits, size_t offset = 1, int index = 0)
+get_bulk (It start, It end, BitT bits, size_t offset = 1, int index = 0)
 {
   __BITF_ASSERT_ITERATOR(It);
   using T = __BITF_VALUE_TYPE_OF(*start);
@@ -158,7 +158,7 @@ collect (It start, It end, BitT bits, size_t offset = 1, int index = 0)
 // insert atomic value to bitfield
 template <class T, class BitT>
 BitT
-insert (T value, int index, size_t offset, BitT bits = 0)
+set_scalar (BitT bits, int index, size_t offset, T value)
 {
   __BITF_ASSERT_UNSIGNED (BitT);
   __BITF_ASSERT_INTEGRAL (T);
@@ -184,7 +184,7 @@ insert (T value, int index, size_t offset, BitT bits = 0)
 // update bitfield with generic container
 template <class It, class BitT>
 BitT
-update (It start, It end, BitT bits, size_t offset = 1, int index = 0)
+set_bulk (It start, It end, BitT bits, size_t offset = 1, int index = 0)
 {
   __BITF_ASSERT_ITERATOR(It);
   using T = __BITF_VALUE_TYPE_OF(*start);
@@ -308,7 +308,7 @@ public:
   constructor (T value, int index, B bits = 0UL)
   {
     data<B>::_bits
-        = solid::insert<T> (value, index, bit_size<T> (value), bits);
+        = solid::set_scalar<T> (bits, index, bit_size<T> (value), value);
   };
   /**
    * create bitfield with vector of atomic values
@@ -316,7 +316,7 @@ public:
    */
   constructor (std::vector<T> values, int index, size_t offset, B bits = 0UL)
   {
-    data<B>::_bits = solid::update(values.begin(), values.end(), (B) bits, offset, index);
+    data<B>::_bits = solid::set_bulk(values.begin(), values.end(), (B) bits, offset, index);
   };
   virtual ~constructor () = default;
 };
@@ -335,7 +335,7 @@ public:
   get_vector (int index, size_t offset, size_t n) const
   {
     auto vec = std::vector<T> (n);
-    solid::collect(vec.begin(), vec.end(), data<B>::_bits, offset, index);
+    solid::get_bulk(vec.begin(), vec.end(), data<B>::_bits, offset, index);
     return vec;
   };
   // get single bit value by index
@@ -358,17 +358,17 @@ public:
 
   // insert atomic value to bitfield
   virtual void
-  insert (T value, int index, size_t offset)
+  set_scalar (int index, size_t offset, T value)
   {
     data<B>::_bits
-        = solid::insert<T> (value, index, offset, data<B>::_bits);
+        = solid::set_scalar<T> (data<B>::_bits, index, offset, value);
   };
 
   // insert vector of atomic values to bitfield
   virtual void
-  insert_vector (std::vector<T> values, int index, size_t offset)
+  set_vector (int index, size_t offset, std::vector<T> values)
   {
-    data<B>::_bits = solid::update(values.begin(), values.end(), data<B>::_bits,offset, index);
+    data<B>::_bits = solid::set_bulk(values.begin(), values.end(), data<B>::_bits,offset, index);
   };
 };
 
