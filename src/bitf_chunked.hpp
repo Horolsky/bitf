@@ -39,16 +39,16 @@ to_str (const T *const chunks, size_t n)
  * max offset = 64
  * TODO: template with params for chunk and return val
  */
-template <class ChunkT, class ScalarT>
-ScalarT
-get_scalar (ChunkT const *chunks, size_t n, int index, const size_t offset)
+template <class T, class BitT>
+T
+get_scalar (BitT const *chunks, size_t n, int index, const size_t offset)
 {
-  __BITF_ASSERT_UNSIGNED (ChunkT);
-  __BITF_ASSERT_INTEGRAL (ScalarT);
+  __BITF_ASSERT_UNSIGNED (BitT);
+  __BITF_ASSERT_INTEGRAL (T);
 
-  const size_t CHUNK_SIZE = solid::bit_capacity<ChunkT> ();
-  const size_t MAX_OFFSET = solid::bit_capacity<ScalarT> ();
-  const size_t MAX_SCALAR = solid::max_value<ScalarT> ();
+  const size_t CHUNK_SIZE = solid::bit_capacity<BitT> ();
+  const size_t MAX_OFFSET = solid::bit_capacity<T> ();
+  const size_t MAX_SCALAR = solid::max_value<T> ();
   const size_t BITS = CHUNK_SIZE * n;
 
   index &= BITS - 1;
@@ -60,13 +60,13 @@ get_scalar (ChunkT const *chunks, size_t n, int index, const size_t offset)
     {
       throw std::overflow_error ("offset + index > chunks bitsize");
     }
-  ScalarT res{ 0 };
+  T res{ 0 };
   size_t i = index % CHUNK_SIZE; // first chunk bit index
-  ChunkT const *chunk = chunks + (n - 1 - i / CHUNK_SIZE);
-  ChunkT const *end = chunk - (offset + i - 1) / CHUNK_SIZE;
+  BitT const *chunk = chunks + (n - 1 - i / CHUNK_SIZE);
+  BitT const *end = chunk - (offset + i - 1) / CHUNK_SIZE;
 
   // first chunk bits
-  res = ((ScalarT)(*chunk)) >> i;
+  res = ((T)(*chunk)) >> i;
 
   // overflow chunks bits
   if (chunk != end)
@@ -74,7 +74,7 @@ get_scalar (ChunkT const *chunks, size_t n, int index, const size_t offset)
       i = CHUNK_SIZE - i;    // res bit index
       while (--chunk >= end) // sic, reverse indexation
         {
-          res |= ((ScalarT)(*chunk)) << i;
+          res |= ((T)(*chunk)) << i;
           i += CHUNK_SIZE;
         }
     }
