@@ -5,32 +5,23 @@
 #include <type_traits>
 #include <vector>
 
+#define __BITF_STRINGIFY(T) #T
+
+#define __BITF_ASSERT_MSG_UNSIGNED(T) __BITF_STRINGIFY (T must be unsigned integer)
+
+#define __BITF_ASSERT_MSG_INTEGRAL(T) __BITF_STRINGIFY (T must be integer)
+
 /**
- * single parameter template:
- * T: unsigned integer type
+ * static assertion for unsigned type
  * */
-#define __BITF_UINT_T(T)                                                      \
-  template <typename T,                                                       \
-            std::enable_if_t<std::is_unsigned<T>::value, bool> = true>
+#define __BITF_ASSERT_INTEGRAL(T)                                             \
+  static_assert (std::is_integral<T>::value, __BITF_ASSERT_MSG_INTEGRAL (T))
+
 /**
- * double parameter template:
- * T: unsigned integer type
- * S: unsigned integer type (def = T)
+ * static assertion for unsigned type
  * */
-#define __BITF_UINT_TT(T, S)                                                  \
-  template <typename T, typename S = T,                                       \
-            std::enable_if_t<std::is_unsigned<T>::value, bool> = true,        \
-            std::enable_if_t<std::is_unsigned<S>::value, bool> = true>
-/**
- * array building template:
- * T: unsigned integer type
- * S: unsigned integer type (def = T)
- * N: array size
- * */
-#define __BITF_UINT_TTA(T, S, N)                                              \
-  template <typename T, typename S, size_t N,                                 \
-            std::enable_if_t<std::is_unsigned<T>::value, bool> = true,        \
-            std::enable_if_t<std::is_unsigned<S>::value, bool> = true>
+#define __BITF_ASSERT_UNSIGNED(T)                                             \
+  static_assert (std::is_unsigned<T>::value, __BITF_ASSERT_MSG_UNSIGNED (T))
 
 namespace bitf
 {
@@ -40,35 +31,39 @@ namespace bitf
 namespace solid
 {
 
-__BITF_UINT_T (T)
 // max value of bitfield storage type
+template <class T>
 inline T
 max_value ()
 {
+  __BITF_ASSERT_UNSIGNED (T);
   return ~0;
 }
 
-__BITF_UINT_T (T)
 // number of stored bits
+template <class T>
 inline size_t
 bit_capacity ()
 {
+  __BITF_ASSERT_INTEGRAL (T);
   return sizeof (T) << 0b11;
 }
 
-__BITF_UINT_T (T)
 // max bitfield index with offset = 1
+template <class T>
 inline size_t
 max_index ()
 {
+  __BITF_ASSERT_INTEGRAL (T);
   return (sizeof (T) << 0b11) - 1;
 }
 
-__BITF_UINT_T (T)
 // number of bits needed to store value
+template <class T = size_t>
 size_t
 bit_size (T value)
 {
+  __BITF_ASSERT_INTEGRAL (T);
   size_t n = 1;
   while (value >>= 1)
     {
@@ -77,11 +72,12 @@ bit_size (T value)
   return n;
 }
 
-__BITF_UINT_T (T)
 // stringify binary representation of bitfield
+template <class T = size_t>
 std::string
 to_str (T bits)
 {
+  __BITF_ASSERT_UNSIGNED (T);
   size_t size = bit_capacity<T> ();
   std::string res (size, '0');
   for (size_t i = 0; i < size; i++)
@@ -94,11 +90,14 @@ to_str (T bits)
   return res;
 }
 
-__BITF_UINT_TT (BitT, RetT)
 // get atomic value from bitdata
+template <class RetT, class BitT = size_t>
 RetT
 get_scalar (BitT bits, int index, size_t offset)
 {
+  __BITF_ASSERT_UNSIGNED (BitT);
+  __BITF_ASSERT_INTEGRAL (RetT);
+
   index &= max_index<BitT> ();
   if (offset + index > bit_capacity<BitT> ())
     {
@@ -112,11 +111,14 @@ get_scalar (BitT bits, int index, size_t offset)
   return (RetT)(bits >> index) & offsetmask;
 }
 
-__BITF_UINT_TT (BitT, RetT)
 // get vector of n atomic values from bitdata
+template <class RetT, class BitT = size_t>
 std::vector<RetT>
 get_vector (BitT bits, int index, size_t offset, size_t n)
 {
+  __BITF_ASSERT_UNSIGNED (BitT);
+  __BITF_ASSERT_INTEGRAL (RetT);
+
   index &= max_index<BitT> ();
 
   if (offset * n + index > bit_capacity<BitT> ())
@@ -147,11 +149,14 @@ get_vector (BitT bits, int index, size_t offset, size_t n)
   return res;
 }
 
-__BITF_UINT_TTA (BitT, RetT, N)
-// get vector of n atomic values from bitdata
+// get array of n atomic values from bitdata
+template <class RetT, size_t N, class BitT = size_t>
 std::array<RetT, N>
 get_array (BitT bits, int index, size_t offset)
 {
+  __BITF_ASSERT_UNSIGNED (BitT);
+  __BITF_ASSERT_INTEGRAL (RetT);
+
   index &= max_index<BitT> ();
 
   if (offset * N + index > bit_capacity<BitT> ())
@@ -184,9 +189,13 @@ get_array (BitT bits, int index, size_t offset)
 
 __BITF_UINT_TT (BitT, ScalT)
 // insert atomic value to bitfield
+template <class ScalT, class BitT>
 BitT
 insert_scalar (ScalT value, int index, size_t offset, BitT bits = 0)
 {
+  __BITF_ASSERT_UNSIGNED (BitT);
+  __BITF_ASSERT_INTEGRAL (ScalT);
+
   index &= max_index<BitT> ();
   if (offset + index > bit_capacity<BitT> ())
     {
@@ -205,12 +214,15 @@ insert_scalar (ScalT value, int index, size_t offset, BitT bits = 0)
   return bits;
 }
 
-__BITF_UINT_TT (BitT, ScalT)
 // insert vector of atomic values to bitfield
+template <class ScalT, class BitT = size_t>
 BitT
 insert_vector (const std::vector<ScalT> &values, int index, size_t offset,
-               BitT bits = 0)
+               BitT bits = 0U)
 {
+  __BITF_ASSERT_UNSIGNED (BitT);
+  __BITF_ASSERT_INTEGRAL (ScalT);
+
   size_t n = values.size ();
   if (!n)
     {
@@ -252,18 +264,21 @@ insert_vector (const std::vector<ScalT> &values, int index, size_t offset,
   i = 0;
   while (i < n)
     {
-      bits |= (values[i] << (offset * i + index));
+      bits |= ((BitT)values[i] << (offset * i + index));
       i++;
     }
   return bits;
 }
 
-__BITF_UINT_TTA (BitT, ScalT, N)
 // insert vector of atomic values to bitfield
+template <class ScalT, size_t N, class BitT = size_t>
 BitT
 insert_array (const std::array<ScalT, N> &values, int index, size_t offset,
               BitT bits = 0)
 {
+
+  __BITF_ASSERT_UNSIGNED (BitT);
+  __BITF_ASSERT_INTEGRAL (ScalT);
   if (0 == N)
     {
       return bits;
@@ -310,9 +325,10 @@ insert_array (const std::array<ScalT, N> &values, int index, size_t offset,
   return bits;
 }
 
-__BITF_UINT_T (T) class data
+template <class T> class data
 {
 protected:
+  __BITF_ASSERT_UNSIGNED (T);
   T _bits;
 
 public:
@@ -362,7 +378,7 @@ public:
   };
 };
 
-__BITF_UINT_T (T) class constructor : public virtual data<T>
+template <class T> class constructor : public virtual data<T>
 {
 public:
   using data<T>::data;
@@ -386,7 +402,7 @@ public:
   virtual ~constructor () = default;
 };
 
-__BITF_UINT_T (T) class accessor : public virtual data<T>
+template <class T> class accessor : public virtual data<T>
 {
 public:
   // get atomic value from bitdata
@@ -409,7 +425,7 @@ public:
   };
 };
 
-__BITF_UINT_T (T) class mutator : public virtual data<T>
+template <class T> class mutator : public virtual data<T>
 {
 public:
   // set bits value

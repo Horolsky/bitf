@@ -55,8 +55,8 @@ TEST (solid_func, util_str)
 
 TEST (solid_func, get_scalar)
 {
-  EXPECT_EQ (solid::get_scalar<size_t> (0b10000101, 2, 1), 1);
-  EXPECT_EQ (solid::get_scalar<size_t> (0b10001000, 3, 1), 1);
+  EXPECT_EQ (solid::get_scalar<size_t> (0b10000101U, 2, 1), 1);
+  EXPECT_EQ (solid::get_scalar<size_t> (0b10001000U, 3, 1), 1);
 
   auto index = solid::max_index<size_t> ();
   auto left = 1UL << index;
@@ -64,12 +64,12 @@ TEST (solid_func, get_scalar)
   EXPECT_EQ (solid::get_scalar<size_t> (left, 0, index), 0);
 
   // offset test
-  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001, 0, 5), 0b1);
-  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001, 1, 4), 0b0);
-  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001, 5, 3), 0b111);
-  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001, 5, 4), 0b111);
-  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001, 5, 5), 0b111);
-  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001, 5, 6), 0b100111);
+  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001U, 0, 5), 0b1);
+  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001U, 1, 4), 0b0);
+  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001U, 5, 3), 0b111);
+  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001U, 5, 4), 0b111);
+  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001U, 5, 5), 0b111);
+  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001U, 5, 6), 0b100111);
 }
 TEST (solid_func, get_vector)
 {
@@ -95,7 +95,7 @@ TEST (solid_func, get_array)
 {
   auto check_array
       = [] (size_t bits, int index, size_t offset, std::array<size_t, 8> &b) {
-          auto a = solid::get_array<size_t, size_t, 8> (bits, index, offset);
+          auto a = solid::get_array<size_t, 8> (bits, index, offset);
           return std::equal (a.begin (), a.end (), b.begin ());
         };
 
@@ -112,6 +112,38 @@ TEST (solid_func, get_array)
   EXPECT_TRUE (check_array (val_3, 0, 3, arr_3));
 }
 
+// TEST (solid_func, get_cont)
+// {
+  // using array_UL8 = std::array<size_t, 8>;
+  // auto check_array
+      // = [] (size_t bits, int index, size_t offset, array_UL8 &b) 
+      // {
+          // auto a = solid::get_cont<size_t, array_UL8> (bits, index, offset, 8);
+          // return std::equal (a.begin (), a.end (), b.begin ());
+        // };
+// 
+  // size_t val_1{ 0b00010001 };
+  // array_UL8 arr_1{ 1, 0, 0, 0, 1, 0, 0, 0 };
+  // EXPECT_TRUE (check_array (val_1, 0, 1, arr_1));
+// 
+  // size_t val_2{ 0b1110010011100100 };
+  // array_UL8 arr_2{ 0, 1, 2, 3, 0, 1, 2, 3 };
+  // EXPECT_TRUE (check_array (val_2, 0, 2, arr_2));
+// 
+  // size_t val_3{ 0b011100010101001110000111 };
+  // array_UL8 arr_3{ 7, 0, 6, 1, 5, 2, 4, 3 };
+  // EXPECT_TRUE (check_array (val_3, 0, 3, arr_3));
+// 
+  // auto check_vec
+      // = [] (size_t bits, int index, size_t offset, std::vector<size_t> &b) {
+          // auto a = solid::get_cont<size_t, std::vector<size_t>> (bits, index, offset, b.size ());
+          // return std::equal (a.begin (), a.end (), b.begin ());
+        // };
+// 
+  // size_t val_4{ 0b00010001 };
+  // std::vector<size_t> vec_4{ 1, 0, 0, 0, 1, 0, 0, 0 };
+  // EXPECT_TRUE (check_vec (val_4, 0, 1, vec_4));
+// }
 #pragma endregion
 
 #pragma region TEST_FUNC_SETTERS
@@ -119,31 +151,32 @@ TEST (solid_func, get_array)
 TEST (solid_func, set_vector)
 {
   std::vector<size_t> vec_1{ 1, 0, 0, 0, 1, 0, 0, 0 };
-  auto val_1 = solid::insert_vector<size_t> (vec_1, 0, 1, 0);
+  auto val_1 = solid::insert_vector<size_t> (vec_1, 0, 1);
   EXPECT_EQ (val_1, 0b00010001);
 
   std::vector<size_t> vec_2{ 0, 1, 2, 3, 0, 1, 2, 3 };
-  auto val_2 = solid::insert_vector<size_t> (vec_2, 0, 2, 0);
+  auto val_2 = solid::insert_vector<size_t> (vec_2, 0, 2);
   EXPECT_EQ (val_2, 0b1110010011100100);
 
   std::vector<size_t> vec_3{ 7, 0, 6, 1, 5, 2, 4, 3 };
-  auto val_3 = solid::insert_vector<size_t> (vec_3, 0, 3, 0);
+  auto val_3 = solid::insert_vector<size_t> (vec_3, 0, 3);
   EXPECT_EQ (val_3, 0b011100010101001110000111);
 }
 
 TEST (solid_func, set_array)
 {
   std::array<size_t, 8> vec_1{ 1, 0, 0, 0, 1, 0, 0, 0 };
-  auto val_1 = solid::insert_array<size_t, size_t, 8> (vec_1, 0, 1, 0);
-  EXPECT_EQ (val_1, 0b00010001);
+  auto val_1 = solid::insert_array<size_t, 8> (vec_1, 0, 1);
+  EXPECT_EQ (val_1, 0b00010001U);
 
   std::array<size_t, 8> vec_2{ 0, 1, 2, 3, 0, 1, 2, 3 };
-  auto val_2 = solid::insert_array<size_t, size_t, 8> (vec_2, 0, 2, 0);
-  EXPECT_EQ (val_2, 0b1110010011100100);
+  auto val_2 = solid::insert_array<size_t, 8> (vec_2, 0, 2);
+  EXPECT_EQ (val_2, 0b1110010011100100U);
 
   std::array<size_t, 8> vec_3{ 7, 0, 6, 1, 5, 2, 4, 3 };
-  auto val_3 = solid::insert_array<size_t, size_t, 8> (vec_3, 0, 3, 0);
-  EXPECT_EQ (val_3, 0b011100010101001110000111);
+  auto val_3 = solid::insert_array<size_t, 8> (vec_3, 0, 3);
+  EXPECT_EQ (val_3, 0b011100010101001110000111U);
 }
+
 
 #pragma endregion
