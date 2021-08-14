@@ -187,7 +187,34 @@ get_array (BitT bits, int index, size_t offset)
   return res;
 }
 
-__BITF_UINT_TT (BitT, ScalT)
+template <class Cont, class BitT = size_t,
+          class Iter = typename Cont::iterator>
+void
+fill_cont (Iter start, Iter end, BitT bits, size_t offset = 1, int index = 0)
+{
+  typedef typename Cont::value_type ScalT;
+  __BITF_ASSERT_UNSIGNED (BitT);
+  __BITF_ASSERT_INTEGRAL (ScalT);
+
+  index &= max_index<BitT> ();
+  if (offset > bit_capacity<ScalT> ())
+    {
+      throw std::overflow_error ("offset > RetT capacity");
+    }
+
+  BitT offsetmask = max_value<BitT> () >> (bit_capacity<BitT> () - offset);
+  size_t i{ 0 };
+
+  while (start < end)
+    {
+      size_t rshift = (index + (offset * i++));
+      BitT shifted = bits >> rshift;
+      BitT val = (shifted & offsetmask);
+      *(start++) = (ScalT)val;
+      // ++start;
+    }
+}
+
 // insert atomic value to bitfield
 template <class ScalT, class BitT>
 BitT

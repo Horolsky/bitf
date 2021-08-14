@@ -144,6 +144,21 @@ TEST (solid_func, get_array)
   // std::vector<size_t> vec_4{ 1, 0, 0, 0, 1, 0, 0, 0 };
   // EXPECT_TRUE (check_vec (val_4, 0, 1, vec_4));
 // }
+
+TEST(solid_func, fill_cont)
+{
+  std::array<size_t, 8> arr1 { 7, 0, 6, 1, 5, 2, 4, 3 };
+  std::array<int, 8> arr2 {};
+  bitf::solid::fill_cont<std::array<int, 8>>(
+    arr2.begin(), 
+    arr2.end(),
+    0b011100010101001110000111UL,
+    3
+    );
+  
+  EXPECT_TRUE(std::equal (arr1.begin (), arr1.end (), arr2.begin ()));
+}
+
 #pragma endregion
 
 #pragma region TEST_FUNC_SETTERS
