@@ -4,32 +4,45 @@ flexible generic bitfields
 ___
 
 ## SOLID BITFIELDS
-namespace **bitf::solid** contains pure generic functions for granular bitwise operations on unsigned integers and OOP wrappers on it
+namespace **bitf::solid** contains generic functions for granular bitwise operations on unsigned integers and OOP wrappers on it
 
 ### pure functions example
 ```c++
-uint8_t x{0b101011};
-cout << bitf::solid::to_str<uint8_t>(x) << endl;
+uint8_t a{0b101011};
+cout << bitf::solid::to_str<uint8_t>(a) << endl;
 // expected output: "00101011"
 
-x = bitf::solid::insert_scalar<uint8_t>(
+a = bitf::solid::insert<uint8_t>(
     1,  // inserting bit '1'
     7,  // to position with index 7
     1,  // with bit offset 1
-    x   // to bitfield target x (default to 0)
+    a   // to bitfield target x (default to 0)
     ); 
 
-cout << bitf::solid::to_str<uint8_t>(x) << endl;
-// expected output: "10101011"
+// expected value of a: 0b10101011
 
-uint8_t bits = bitf::solid::get_scalar<uint8_t>(
-    x,  // getting few bits as single value from bitfield source x
+//note that scalar values type can be different from bitfield type
+int scalar = bitf::solid::get_scalar<int>(
+    a,  // getting few bits as single value from bitfield source x
     3,  // from index 3
     3   // offset 3
-    );  // i. e. 0b101 or 5
+    ); 
+// expected scalar value: 0b101                    
 
-cout << bitf::solid::to_str<uint8_t>(bits) << endl;
-// expected output: "00000101"                    
+// generic update, 
+std::vector<int> vec { 7, 0, 6, 1, 5, 2, 4, 3 };
+size_t bits = solid::update(
+    vec_3.begin(),  // starting iterator
+    vec_3.end(),    // ending iterator
+    0UL,            // target bits
+    3               // offset
+    );             
+// expected value of bits: 0b011100010101001110000111
+
+//same generic function with raw arrays
+int raw_arr[8] { 7, 0, 6, 1, 5, 2, 4, 3 };
+size_t val_4 = solid::update(raw_arr, raw_arr+8, 0UL, 3);
+// expected value of bits: 0b011100010101001110000111
 ```
     
 ### example of class design and usage
@@ -45,7 +58,7 @@ public virtual bitf::solid::mutator<size_t>  // exclude mutator to get immutable
 };
 
 BitField x {};          // initialized to 0
-x.insert_vector(
+x.insert(
     {1,0,2,0,3},        // atomic bitwise data
     1,                  // starting index
     2                   // offset
