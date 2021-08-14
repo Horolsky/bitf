@@ -156,7 +156,7 @@ TEST (solid_mutator, insert_3bits)
 
 TEST (solid_mutator, set_vector)
 {
-  BitF x{ 0 };
+  BitF x{ 0UL };
   x.insert_vector ({ 1, 0, 2, 0, 3 }, 1, 2);
   auto bv = x.bits ();
   EXPECT_EQ (bv, 0b11001000010);
