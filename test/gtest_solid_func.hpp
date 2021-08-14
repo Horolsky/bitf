@@ -168,4 +168,23 @@ TEST (solid_func, set_array)
   EXPECT_EQ (val_3, 0b011100010101001110000111U);
 }
 
+TEST (solid_func, fill)
+{
+  std::vector<size_t> vec_1{ 1, 0, 0, 0, 1, 0, 0, 0 };
+  auto val_1 = solid::fill(vec_1.begin(), vec_1.end());
+  EXPECT_EQ (val_1, 0b00010001);
+
+  std::vector<size_t> vec_2{ 0, 1, 2, 3, 0, 1, 2, 3 };
+  auto val_2 = solid::fill(vec_2.begin(), vec_2.end(), 0UL, 2);
+  EXPECT_EQ (val_2, 0b1110010011100100);
+
+  std::vector<size_t> vec_3{ 7, 0, 6, 1, 5, 2, 4, 3 };
+  auto val_3 = solid::fill(vec_3.begin(), vec_3.end(), 0UL, 3);
+  EXPECT_EQ (val_3, 0b011100010101001110000111);
+
+  int raw_arr[8] { 7, 0, 6, 1, 5, 2, 4, 3 };
+  auto val_4 = solid::fill(raw_arr, raw_arr+8, 0UL, 3);
+  EXPECT_EQ (val_4, 0b011100010101001110000111);
+}
+
 #pragma endregion

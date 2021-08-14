@@ -257,6 +257,64 @@ insert_scalar (T value, int index, size_t offset, BitT bits = 0)
   return bits;
 }
 
+template <class It, class BitT = size_t>
+BitT
+fill (It start, It end, BitT bits = 0UL, size_t offset = 1, int index = 0)
+{
+  __BITF_ASSERT_ITERATOR(It);
+  using T = __BITF_VALUE_TYPE_OF(*start);
+  __BITF_ASSERT_INTEGRAL (T);
+  __BITF_ASSERT_UNSIGNED (BitT);
+  
+  if (end < start)
+  {
+    throw std::range_error("end < start");
+  }
+  size_t n = end - start;
+  if (n == 0){
+    return bits;
+  }
+  index &= max_index<BitT> ();
+
+  if (offset * n + index > bit_capacity<BitT> ())
+    {
+      throw std::overflow_error ("offset + index > BitT capacity");
+    }
+
+  size_t maxn = (bit_capacity<BitT> () - index) / offset;
+  if (n > maxn)
+    {
+      throw std::overflow_error ("vector size > BitT capacity");
+    }
+
+  T maxvalue = start[0];
+  size_t i = 0;
+  while (i < n)
+    {
+      if (start[i] > maxvalue)
+        {
+          maxvalue = start[i];
+        }
+      i++;
+    }
+  if (bit_size<T> (maxvalue) > offset)
+    {
+      throw std::overflow_error ("vector value > offset");
+    }
+
+  BitT offsetmask
+      = max_value<BitT> () >> (bit_capacity<BitT> () - (offset * n + index));
+  BitT indexmask = offsetmask >> (offset * n);
+  BitT mask = ~(offsetmask ^ indexmask);
+  bits &= mask;
+  i = 0;
+  while (i < n)
+    {
+      bits |= ((BitT)start[i] << (offset * i + index));
+      i++;
+    }
+  return bits;
+}
 // insert vector of atomic values to bitfield
 template <class T, class BitT = size_t>
 BitT
