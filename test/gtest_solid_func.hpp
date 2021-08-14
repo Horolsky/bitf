@@ -9,15 +9,15 @@ using namespace bitf;
 
 #pragma region TEST_FUNC_CONST
 
-TEST (solid_func, bit_size)
+TEST (solid_func, bit_capacity)
 {
-  auto s_uc = solid::bit_size<unsigned char> ();
+  auto s_uc = solid::bit_capacity<unsigned char> ();
   EXPECT_EQ (s_uc, sizeof (unsigned char) << 0b11);
 
-  auto s_ud = solid::bit_size<unsigned int> ();
+  auto s_ud = solid::bit_capacity<unsigned int> ();
   EXPECT_EQ (s_ud, sizeof (unsigned int) << 0b11);
 
-  auto s_ul = solid::bit_size<size_t> ();
+  auto s_ul = solid::bit_capacity<size_t> ();
   EXPECT_EQ (s_ul, sizeof (size_t) << 0b11);
 }
 
@@ -39,8 +39,8 @@ TEST (solid_func, max_value)
 
 TEST (solid_func, util_nofbits)
 {
-  EXPECT_EQ (solid::bit_width<size_t> (0b10101), 5);
-  EXPECT_EQ (solid::bit_width<size_t> (0b1000100010001000), 16);
+  EXPECT_EQ (solid::bit_size<size_t> (0b10101), 5);
+  EXPECT_EQ (solid::bit_size<size_t> (0b1000100010001000), 16);
 }
 
 TEST (solid_func, util_str)

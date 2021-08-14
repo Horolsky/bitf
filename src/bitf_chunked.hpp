@@ -13,11 +13,11 @@ namespace bitf
 namespace chunked
 {
 
-__GENERIC_UNSIGNED_TYPE(T)
+__BITF_UINT_T(T)
 std::string
 to_str (const T *const chunks, size_t n)
 {
-  const T CHUNK_SIZE = solid::bit_size<T> ();
+  const T CHUNK_SIZE = solid::bit_capacity<T> ();
   std::string res (CHUNK_SIZE * n, '0');
 
   for (size_t i = 0; i < n; i++)
@@ -38,12 +38,12 @@ to_str (const T *const chunks, size_t n)
  * max offset = 64
  * TODO: template with params for chunk and return val
  */
-__GENERIC_UNSIGNED_TYPES(ChunkT, ScalarT) 
+__BITF_UINT_TT(ChunkT, ScalarT) 
 ScalarT
 get_scalar (ChunkT const *chunks, size_t n, int index, const size_t offset)
 {
-  const size_t CHUNK_SIZE = solid::bit_size<ChunkT> ();
-  const size_t MAX_OFFSET = solid::bit_size<ScalarT> ();
+  const size_t CHUNK_SIZE = solid::bit_capacity<ChunkT> ();
+  const size_t MAX_OFFSET = solid::bit_capacity<ScalarT> ();
   const size_t MAX_SCALAR = solid::max_value<ScalarT> ();
   const size_t BITS = CHUNK_SIZE * n;
 
@@ -98,7 +98,7 @@ struct _static
   size_t
   bits () const
   {
-    return solid::bit_size<T> () * N;
+    return solid::bit_capacity<T> () * N;
   }
 };
 
@@ -106,7 +106,7 @@ struct _static
  * dynamic bitdata storage struct
  * T: chunk type, unsigned integer only
  */
-__GENERIC_UNSIGNED_TYPE(T)
+__BITF_UINT_T(T)
 struct _dynamic
 {
   std::vector<T> _data{};
@@ -118,7 +118,7 @@ struct _dynamic
   size_t
   bits () const
   {
-    return solid::bit_size<T> () * _data.size ();
+    return solid::bit_capacity<T> () * _data.size ();
   }
 };
 
