@@ -134,15 +134,15 @@ TEST (solid_func, set_vector)
 TEST (solid_func, set_array)
 {
   std::array<size_t, 8> vec_1{ 1, 0, 0, 0, 1, 0, 0, 0 };
-  auto val_1 = solid::insert_array<size_t,size_t,8> (vec_1, 0, 1, 0);
+  auto val_1 = solid::insert_array<size_t, size_t, 8> (vec_1, 0, 1, 0);
   EXPECT_EQ (val_1, 0b00010001);
 
   std::array<size_t, 8> vec_2{ 0, 1, 2, 3, 0, 1, 2, 3 };
-  auto val_2 = solid::insert_array<size_t,size_t,8> (vec_2, 0, 2, 0);
+  auto val_2 = solid::insert_array<size_t, size_t, 8> (vec_2, 0, 2, 0);
   EXPECT_EQ (val_2, 0b1110010011100100);
 
   std::array<size_t, 8> vec_3{ 7, 0, 6, 1, 5, 2, 4, 3 };
-  auto val_3 = solid::insert_array<size_t,size_t,8> (vec_3, 0, 3, 0);
+  auto val_3 = solid::insert_array<size_t, size_t, 8> (vec_3, 0, 3, 0);
   EXPECT_EQ (val_3, 0b011100010101001110000111);
 }
 

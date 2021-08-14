@@ -13,7 +13,7 @@ namespace bitf
 namespace chunked
 {
 
-__BITF_UINT_T(T)
+__BITF_UINT_T (T)
 std::string
 to_str (const T *const chunks, size_t n)
 {
@@ -38,7 +38,7 @@ to_str (const T *const chunks, size_t n)
  * max offset = 64
  * TODO: template with params for chunk and return val
  */
-__BITF_UINT_TT(ChunkT, ScalarT) 
+__BITF_UINT_TT (ChunkT, ScalarT)
 ScalarT
 get_scalar (ChunkT const *chunks, size_t n, int index, const size_t offset)
 {
@@ -106,7 +106,7 @@ struct _static
  * dynamic bitdata storage struct
  * T: chunk type, unsigned integer only
  */
-__BITF_UINT_T(T)
+__BITF_UINT_T (T)
 struct _dynamic
 {
   std::vector<T> _data{};
