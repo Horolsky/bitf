@@ -112,14 +112,26 @@ TEST (solid_func, get_array)
   EXPECT_TRUE (check_array (val_3, 0, 3, arr_3));
 }
 
-TEST (solid_func, fill_cont)
+TEST (solid_func, collect)
 {
+  const size_t BITS = 0b011100010101001110000111UL;
   std::array<size_t, 8> arr1{ 7, 0, 6, 1, 5, 2, 4, 3 };
   std::array<int, 8> arr2{};
-  bitf::solid::fill_cont<std::array<int, 8> > (
-      arr2.begin (), arr2.end (), 0b011100010101001110000111UL, 3);
+  bitf::solid::collect(
+      arr2.begin (), arr2.end (), BITS, 3);
+
+  std::vector<int> vec{};
+  bitf::solid::collect(
+      vec.begin (), vec.end (), BITS, 3);
+
+  int raw_arr[8];
+  bitf::solid::collect(
+      raw_arr, raw_arr+8, BITS, 3);
+
 
   EXPECT_TRUE (std::equal (arr1.begin (), arr1.end (), arr2.begin ()));
+  EXPECT_TRUE (std::equal (vec.begin (), vec.end (), arr2.begin ()));
+  EXPECT_TRUE (std::equal (std::begin(raw_arr), std::end (raw_arr), arr2.begin ()));
 }
 
 #pragma endregion

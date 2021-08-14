@@ -7,9 +7,13 @@
 
 #define __BITF_STRINGIFY(T) #T
 
-#define __BITF_ASSERT_MSG_UNSIGNED(T) __BITF_STRINGIFY (T must be unsigned integer)
+#define __BITF_ASSERT_MSG_UNSIGNED(T)                                         \
+  __BITF_STRINGIFY (T must be unsigned integer)
 
 #define __BITF_ASSERT_MSG_INTEGRAL(T) __BITF_STRINGIFY (T must be integer)
+
+#define __BITF_ASSERT_MSG_ITERATOR(T)                                         \
+  __BITF_STRINGIFY (T must be pointer or iterator)
 
 /**
  * static assertion for unsigned type
@@ -22,6 +26,19 @@
  * */
 #define __BITF_ASSERT_UNSIGNED(T)                                             \
   static_assert (std::is_unsigned<T>::value, __BITF_ASSERT_MSG_UNSIGNED (T))
+
+template<class T> struct __deref_type     { typedef T type; };
+template<class T> struct __deref_type<T*> { typedef T type; };
+template<class T> struct __deref_type<T&> { typedef T type; };
+
+#define __BITF_VALUE_TYPE_OF(V) typename __deref_type<decltype(V)>::type; 
+
+#define __BITF_ASSERT_ITERATOR(T)                                             \
+  static_assert (                                                             \
+      std::is_pointer<T>::value                                              \
+          || !std::is_same<typename std::iterator_traits<T>::value_type,     \
+                           void>::value,                                      \
+      __BITF_ASSERT_MSG_ITERATOR(T))
 
 namespace bitf
 {
@@ -187,14 +204,14 @@ get_array (BitT bits, int index, size_t offset)
   return res;
 }
 
-template <class Cont, class Iter = typename Cont::iterator, class BitT = size_t>
+template <class It, class BitT = size_t>
 void
-fill_cont (Iter start, Iter end, BitT bits, size_t offset = 1, int index = 0)
+collect (It start, It end, BitT bits, size_t offset = 1, int index = 0)
 {
-  typedef typename Cont::value_type T;
+  __BITF_ASSERT_ITERATOR(It);
+  using T = __BITF_VALUE_TYPE_OF(*start);
   __BITF_ASSERT_INTEGRAL (T);
   __BITF_ASSERT_UNSIGNED (BitT);
-  
 
   index &= max_index<BitT> ();
   if (offset > bit_capacity<T> ())
