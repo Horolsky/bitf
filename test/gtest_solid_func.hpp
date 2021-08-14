@@ -91,6 +91,26 @@ TEST (solid_func, get_vector)
   std::vector<size_t> vec_3{ 7, 0, 6, 1, 5, 2, 4, 3 };
   EXPECT_TRUE (check_vector (val_3, 0, 3, vec_3));
 }
+TEST (solid_func, get_array)
+{
+  auto check_array
+      = [] (size_t bits, int index, size_t offset, std::array<size_t, 8> &b) {
+          auto a = solid::get_array<size_t, size_t, 8> (bits, index, offset);
+          return std::equal (a.begin (), a.end (), b.begin ());
+        };
+
+  size_t val_1{ 0b00010001 };
+  std::array<size_t, 8> arr_1{ 1, 0, 0, 0, 1, 0, 0, 0 };
+  EXPECT_TRUE (check_array (val_1, 0, 1, arr_1));
+
+  size_t val_2{ 0b1110010011100100 };
+  std::array<size_t, 8> arr_2{ 0, 1, 2, 3, 0, 1, 2, 3 };
+  EXPECT_TRUE (check_array (val_2, 0, 2, arr_2));
+
+  size_t val_3{ 0b011100010101001110000111 };
+  std::array<size_t, 8> arr_3{ 7, 0, 6, 1, 5, 2, 4, 3 };
+  EXPECT_TRUE (check_array (val_3, 0, 3, arr_3));
+}
 
 #pragma endregion
 
@@ -108,6 +128,21 @@ TEST (solid_func, set_vector)
 
   std::vector<size_t> vec_3{ 7, 0, 6, 1, 5, 2, 4, 3 };
   auto val_3 = solid::insert_vector<size_t> (vec_3, 0, 3, 0);
+  EXPECT_EQ (val_3, 0b011100010101001110000111);
+}
+
+TEST (solid_func, set_array)
+{
+  std::array<size_t, 8> vec_1{ 1, 0, 0, 0, 1, 0, 0, 0 };
+  auto val_1 = solid::insert_array<size_t,size_t,8> (vec_1, 0, 1, 0);
+  EXPECT_EQ (val_1, 0b00010001);
+
+  std::array<size_t, 8> vec_2{ 0, 1, 2, 3, 0, 1, 2, 3 };
+  auto val_2 = solid::insert_array<size_t,size_t,8> (vec_2, 0, 2, 0);
+  EXPECT_EQ (val_2, 0b1110010011100100);
+
+  std::array<size_t, 8> vec_3{ 7, 0, 6, 1, 5, 2, 4, 3 };
+  auto val_3 = solid::insert_array<size_t,size_t,8> (vec_3, 0, 3, 0);
   EXPECT_EQ (val_3, 0b011100010101001110000111);
 }
 

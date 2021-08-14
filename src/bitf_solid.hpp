@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -27,9 +28,9 @@
  * N: array size
  * */
 #define __BITF_UINT_TTA(T, S, N)                                      \
-  template <typename T, typename S = T1, size_t N,                                         \
-            std::enable_if_t<std::is_unsigned<T1>::value, bool> = true,       \
-            std::enable_if_t<std::is_unsigned<T2>::value, bool> = true>
+  template <typename T, typename S, size_t N,                                         \
+            std::enable_if_t<std::is_unsigned<T>::value, bool> = true,       \
+            std::enable_if_t<std::is_unsigned<S>::value, bool> = true>
 
 namespace bitf
 {
@@ -146,6 +147,41 @@ get_vector (BitT bits, int index, size_t offset, size_t n)
   return res;
 }
 
+__BITF_UINT_TTA (BitT, RetT, N)
+// get vector of n atomic values from bitdata
+std::array<RetT, N>
+get_array (BitT bits, int index, size_t offset)
+{
+  index &= max_index<BitT> ();
+
+  if (offset * N + index > bit_capacity<BitT> ())
+    {
+      throw std::overflow_error ("offset + index > BitT capacity");
+    }
+  if (offset > bit_capacity<RetT>())
+  {
+      throw std::overflow_error ("offset > RetT capacity");
+  }
+
+  size_t maxn = (bit_capacity<BitT> () - index) / offset;
+  if (N > maxn)
+  {
+    throw std::overflow_error ("vector size > BitT capacity");
+  }
+  std::array<RetT, N> res{};
+  
+  BitT offsetmask = max_value<BitT> () >> (bit_capacity<BitT> () - offset);
+
+  for (size_t i = 0; i < N; i++)
+    {
+      size_t rshift = (index + (offset * i));
+      BitT shifted = bits >> rshift;
+      BitT val = (shifted & offsetmask);
+      res[i] = val;
+    }
+  return res;
+}
+
 __BITF_UINT_TT (BitT, ScalT)
 // insert atomic value to bitfield
 BitT
@@ -171,7 +207,7 @@ insert_scalar (ScalT value, int index, size_t offset, BitT bits = 0)
 __BITF_UINT_TT (BitT, ScalT)
 // insert vector of atomic values to bitfield
 BitT
-insert_vector (std::vector<ScalT> values, int index, size_t offset, BitT bits = 0)
+insert_vector (const std::vector<ScalT> &values, int index, size_t offset, BitT bits = 0)
 {
   size_t n = values.size ();
   if (!n)
@@ -212,6 +248,56 @@ insert_vector (std::vector<ScalT> values, int index, size_t offset, BitT bits = 
   bits &= mask;
   i = 0;
   while (i < n)
+    {
+      bits |= (values[i] << (offset * i + index));
+      i++;
+    }
+  return bits;
+}
+
+__BITF_UINT_TTA (BitT, ScalT, N)
+// insert vector of atomic values to bitfield
+BitT
+insert_array (const std::array<ScalT, N> &values, int index, size_t offset, BitT bits = 0)
+{
+  if (0 == N)
+    {
+      return bits;
+    }
+
+  index &= max_index<BitT> ();
+  if (offset*N + index > bit_capacity<BitT> ())
+    {
+      throw std::overflow_error ("offset + index > BitT capacity");
+    }
+
+  size_t maxn = (bit_capacity<BitT> () - index) / offset;
+  if (N > maxn)
+    {
+      throw std::overflow_error ("vector size > BitT capacity");
+    }
+
+  ScalT maxvalue = values[0];
+  size_t i = 0;
+  while (i < N)
+    {
+      if (values[i] > maxvalue)
+        {
+          maxvalue = values[i];
+        }
+      i++;
+    }
+  if (bit_size<ScalT>(maxvalue) > offset)
+    {
+      throw std::overflow_error ("vector value > offset");
+    }
+
+  BitT offsetmask = max_value<BitT> () >> (bit_capacity<BitT> () - (offset * N + index));
+  BitT indexmask = offsetmask >> (offset * N);
+  BitT mask = ~(offsetmask ^ indexmask);
+  bits &= mask;
+  i = 0;
+  while (i < N)
     {
       bits |= (values[i] << (offset * i + index));
       i++;
