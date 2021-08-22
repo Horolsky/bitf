@@ -7,38 +7,38 @@
 
 #define _BITF_STRINGIFY(T) #T
 
-#define _BITF_ASSERT_MSG_UNSIGNED(T)                                         \
+#define _BITF_ASSERT_MSG_UNSIGNED(T)                                          \
   _BITF_STRINGIFY (T must be unsigned integer)
 
 #define _BITF_ASSERT_MSG_INTEGRAL(T) _BITF_STRINGIFY (T must be integer)
 
-#define _BITF_ASSERT_MSG_ITERATOR(T)                                         \
+#define _BITF_ASSERT_MSG_ITERATOR(T)                                          \
   _BITF_STRINGIFY (T must be pointer or iterator)
 
 /**
  * static assertion for unsigned type
  * */
-#define _BITF_ASSERT_INTEGRAL(T)                                             \
+#define _BITF_ASSERT_INTEGRAL(T)                                              \
   static_assert (std::is_integral<T>::value, _BITF_ASSERT_MSG_INTEGRAL (T))
 
 /**
  * static assertion for unsigned type
  * */
-#define _BITF_ASSERT_UNSIGNED(T)                                             \
+#define _BITF_ASSERT_UNSIGNED(T)                                              \
   static_assert (std::is_unsigned<T>::value, _BITF_ASSERT_MSG_UNSIGNED (T))
 
 template<class T> struct _bitf_deref_type     { typedef T type; };
 template<class T> struct _bitf_deref_type<T*> { typedef T type; };
 template<class T> struct _bitf_deref_type<T&> { typedef T type; };
 
-#define _BITF_VALUE_TYPE_OF(V) typename _bitf_deref_type<decltype(V)>::type; 
+#define _BITF_VALUE_TYPE_OF(V) typename _bitf_deref_type<decltype (V)>::type;
 
-#define _BITF_ASSERT_ITERATOR(T)                                             \
+#define _BITF_ASSERT_ITERATOR(T)                                              \
   static_assert (                                                             \
-      std::is_pointer<T>::value                                              \
-          || !std::is_same<typename std::iterator_traits<T>::value_type,     \
+      std::is_pointer<T>::value                                               \
+          || !std::is_same<typename std::iterator_traits<T>::value_type,      \
                            void>::value,                                      \
-      _BITF_ASSERT_MSG_ITERATOR(T))
+      _BITF_ASSERT_MSG_ITERATOR (T))
 
 namespace bitf
 {
@@ -132,19 +132,20 @@ template <class It, class BitT>
 void
 get_bulk (It start, It end, BitT bits, size_t offset = 1, int indent = 0)
 {
-  _BITF_ASSERT_ITERATOR(It);
-  using T = _BITF_VALUE_TYPE_OF(*start);
+  _BITF_ASSERT_ITERATOR (It);
+  using T = _BITF_VALUE_TYPE_OF (*start);
   _BITF_ASSERT_INTEGRAL (T);
   _BITF_ASSERT_UNSIGNED (BitT);
 
   if (end < start)
-  {
-    throw std::range_error("end < start");
-  }
+    {
+      throw std::range_error ("end < start");
+    }
   size_t n = end - start;
-  if (n == 0){
-    return;
-  }
+  if (n == 0)
+    {
+      return;
+    }
 
   indent &= max_index<BitT> ();
 
@@ -188,7 +189,7 @@ set_scalar (T value, BitT bits, size_t offset, int indent)
     {
       throw std::overflow_error ("offset + indent > BitT capacity");
     }
-  
+
   BitT offsetmask
       = max_value<BitT> () >> (bit_capacity<BitT> () - (offset + indent));
   BitT indexmask = offsetmask >> offset;
@@ -203,19 +204,20 @@ template <class It, class BitT>
 BitT
 set_bulk (It start, It end, BitT bits, size_t offset = 1, int indent = 0)
 {
-  _BITF_ASSERT_ITERATOR(It);
-  using T = _BITF_VALUE_TYPE_OF(*start);
+  _BITF_ASSERT_ITERATOR (It);
+  using T = _BITF_VALUE_TYPE_OF (*start);
   _BITF_ASSERT_INTEGRAL (T);
   _BITF_ASSERT_UNSIGNED (BitT);
-  
+
   if (end < start)
-  {
-    throw std::range_error("end < start");
-  }
+    {
+      throw std::range_error ("end < start");
+    }
   size_t n = end - start;
-  if (n == 0){
-    return bits;
-  }
+  if (n == 0)
+    {
+      return bits;
+    }
   indent &= max_index<BitT> ();
 
   if (offset * n + indent > bit_capacity<BitT> ())
@@ -230,7 +232,7 @@ set_bulk (It start, It end, BitT bits, size_t offset = 1, int indent = 0)
     }
 
   T maxvalue = start[0];
-  for(size_t i = 0; i <n; i++)
+  for (size_t i = 0; i < n; i++)
     {
       if (start[i] > maxvalue)
         {
@@ -247,7 +249,7 @@ set_bulk (It start, It end, BitT bits, size_t offset = 1, int indent = 0)
   BitT indexmask = offsetmask >> (offset * n);
   BitT mask = ~(offsetmask ^ indexmask);
   bits &= mask;
-  for(size_t i = 0; i <n; i++)
+  for (size_t i = 0; i < n; i++)
     {
       bits |= ((BitT)start[i] << (offset * i + indent));
     }
@@ -256,7 +258,7 @@ set_bulk (It start, It end, BitT bits, size_t offset = 1, int indent = 0)
 
 namespace cls
 {
-  
+
 template <class T> class data
 {
 protected:
@@ -329,7 +331,8 @@ public:
    */
   constructor (std::vector<T> values, int indent, size_t offset, B bits = 0UL)
   {
-    data<B>::_bits = solid::set_bulk(values.begin(), values.end(), (B) bits, offset, indent);
+    data<B>::_bits = solid::set_bulk (values.begin (), values.end (), (B)bits,
+                                      offset, indent);
   };
   virtual ~constructor () = default;
 };
@@ -348,7 +351,7 @@ public:
   get_vector (size_t n, size_t offset, int indent = 0) const
   {
     auto vec = std::vector<T> (n);
-    solid::get_bulk(vec.begin(), vec.end(), data<B>::_bits, offset, indent);
+    solid::get_bulk (vec.begin (), vec.end (), data<B>::_bits, offset, indent);
     return vec;
   };
   // get single bit value by index
@@ -381,7 +384,8 @@ public:
   virtual void
   set_vector (std::vector<T> values, size_t offset, int indent = 0)
   {
-    data<B>::_bits = solid::set_bulk(values.begin(), values.end(), data<B>::_bits,offset, indent);
+    data<B>::_bits = solid::set_bulk (values.begin (), values.end (),
+                                      data<B>::_bits, offset, indent);
   };
 };
 
