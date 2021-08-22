@@ -27,11 +27,11 @@
 #define _BITF_ASSERT_UNSIGNED(T)                                             \
   static_assert (std::is_unsigned<T>::value, _BITF_ASSERT_MSG_UNSIGNED (T))
 
-template<class T> struct __deref_type     { typedef T type; };
-template<class T> struct __deref_type<T*> { typedef T type; };
-template<class T> struct __deref_type<T&> { typedef T type; };
+template<class T> struct _bitf_deref_type     { typedef T type; };
+template<class T> struct _bitf_deref_type<T*> { typedef T type; };
+template<class T> struct _bitf_deref_type<T&> { typedef T type; };
 
-#define _BITF_VALUE_TYPE_OF(V) typename __deref_type<decltype(V)>::type; 
+#define _BITF_VALUE_TYPE_OF(V) typename _bitf_deref_type<decltype(V)>::type; 
 
 #define _BITF_ASSERT_ITERATOR(T)                                             \
   static_assert (                                                             \
@@ -178,15 +178,17 @@ set_scalar (T value, BitT bits, size_t offset, int indent)
   _BITF_ASSERT_UNSIGNED (BitT);
   _BITF_ASSERT_INTEGRAL (T);
 
+  if (bit_size<T> (value) > offset)
+    {
+      throw std::overflow_error ("value bit width > offset");
+    }
+
   indent &= max_index<BitT> ();
   if (offset + indent > bit_capacity<BitT> ())
     {
       throw std::overflow_error ("offset + indent > BitT capacity");
     }
-  if (bit_size<T> (value) > offset)
-    {
-      throw std::overflow_error ("value bit width > offset");
-    }
+  
   BitT offsetmask
       = max_value<BitT> () >> (bit_capacity<BitT> () - (offset + indent));
   BitT indexmask = offsetmask >> offset;
@@ -228,14 +230,12 @@ set_bulk (It start, It end, BitT bits, size_t offset = 1, int indent = 0)
     }
 
   T maxvalue = start[0];
-  size_t i = 0;
-  while (i < n)
+  for(size_t i = 0; i <n; i++)
     {
       if (start[i] > maxvalue)
         {
           maxvalue = start[i];
         }
-      i++;
     }
   if (bit_size<T> (maxvalue) > offset)
     {
@@ -247,11 +247,9 @@ set_bulk (It start, It end, BitT bits, size_t offset = 1, int indent = 0)
   BitT indexmask = offsetmask >> (offset * n);
   BitT mask = ~(offsetmask ^ indexmask);
   bits &= mask;
-  i = 0;
-  while (i < n)
+  for(size_t i = 0; i <n; i++)
     {
       bits |= ((BitT)start[i] << (offset * i + indent));
-      i++;
     }
   return bits;
 }
