@@ -79,7 +79,7 @@ TEST (solid_constructor, set_vector)
   BitF a{ vec, 0, 2 };
 
   bool equal = true;
-  auto ret_vec = a.get_vector (0, 2, vec.size ());
+  auto ret_vec = a.get_vector (vec.size (), 2);
 
   for (size_t i = 0; i < vec.size (); i++)
     if (vec[i] != ret_vec[i])
@@ -103,11 +103,11 @@ TEST (solid_constructor, vector_update)
 TEST (solid_accessor, get_scalar)
 {
   BitF x1{ 0b10101 };
-  size_t a1 = x1.get_scalar (2, 1);
+  size_t a1 = x1.get_scalar (1, 2);
   EXPECT_EQ (a1, 0b1);
 
   BitF x2{ 0b10101 };
-  size_t a2 = x2.get_scalar (2, 3);
+  size_t a2 = x2.get_scalar (3, 2);
   EXPECT_EQ (a2, 0b101);
 
   BitF x3{ 0b10101 };
@@ -120,7 +120,7 @@ TEST (solid_accessor, get_vector)
   BitF x{ 0b1100100001 };
   std::vector<size_t> vec{ 1, 0, 2, 0, 3 };
   bool equal = true;
-  auto ret_vec = x.get_vector (0, 2, vec.size ());
+  auto ret_vec = x.get_vector (vec.size (), 2UL);
 
   for (size_t i = 0; i < vec.size (); i++)
     if (vec[i] != ret_vec[i])
@@ -143,26 +143,26 @@ TEST (solid_mutator, set_zero)
 TEST (solid_mutator, insert_1bit)
 {
   BitF x{ 0b10001 };
-  x.set_scalar (2, 1, 1);
+  x.set_scalar (1U, 1, 2);
   EXPECT_EQ (x.bits (), 0b10101);
 }
 
 TEST (solid_mutator, insert_3bits)
 {
   BitF x{ 0b10000001 };
-  x.set_scalar (3, 3, 0b111);
+  x.set_scalar (0b111U, 3, 3);
   EXPECT_EQ (x.bits (), 0b10111001);
 }
 
 TEST (solid_mutator, set_vector)
 {
   BitF x{ 0UL };
-  x.set_vector (1, 2, { 1, 0, 2, 0, 3 });
+  x.set_vector ({ 1, 0, 2, 0, 3 }, 2, 1);
   auto bv = x.bits ();
   EXPECT_EQ (bv, 0b11001000010);
 
   BitF y{ 0b10000000 };
-  y.set_vector (0, 2, { 1, 2, 3 });
+  y.set_vector ({ 1, 2, 3 }, 2);
   EXPECT_EQ (y.bits (), 0b10111001);
 }
 

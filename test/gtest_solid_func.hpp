@@ -55,21 +55,21 @@ TEST (solid_func, util_str)
 
 TEST (solid_func, get_scalar)
 {
-  EXPECT_EQ (solid::get_scalar<size_t> (0b10000101U, 2, 1), 1);
-  EXPECT_EQ (solid::get_scalar<size_t> (0b10001000U, 3, 1), 1);
+  EXPECT_EQ (solid::get_scalar<size_t> (0b10000101U, 1, 2), 1);
+  EXPECT_EQ (solid::get_scalar<size_t> (0b10001000U, 1, 3), 1);
 
   auto index = solid::max_index<size_t> ();
   auto left = 1UL << index;
-  EXPECT_EQ (solid::get_scalar<size_t> (left, index, 1), 1);
-  EXPECT_EQ (solid::get_scalar<size_t> (left, 0, index), 0);
+  EXPECT_EQ (solid::get_scalar<size_t> (left, 1, index), 1);
+  EXPECT_EQ (solid::get_scalar<size_t> (left, index, 0), 0);
 
   // offset test
-  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001U, 0, 5), 0b1);
-  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001U, 1, 4), 0b0);
-  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001U, 5, 3), 0b111);
-  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001U, 5, 4), 0b111);
+  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001U, 5, 0), 0b1);
+  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001U, 4, 1), 0b0);
+  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001U, 3, 5), 0b111);
+  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001U, 4, 5), 0b111);
   EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001U, 5, 5), 0b111);
-  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001U, 5, 6), 0b100111);
+  EXPECT_EQ (solid::get_scalar<size_t> (0b10011100001U, 6, 5), 0b100111);
 }
 
 TEST (solid_func, get_bulk)

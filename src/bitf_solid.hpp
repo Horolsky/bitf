@@ -110,7 +110,7 @@ to_string (T bits)
 // get atomic value from bitdata
 template <class T, class BitT>
 T
-get_scalar (BitT bits, int indent, size_t offset = 1)
+get_scalar (BitT bits, size_t offset, int indent)
 {
   __BITF_ASSERT_UNSIGNED (BitT);
   __BITF_ASSERT_INTEGRAL (T);
@@ -137,7 +137,22 @@ get_bulk (It start, It end, BitT bits, size_t offset = 1, int indent = 0)
   __BITF_ASSERT_INTEGRAL (T);
   __BITF_ASSERT_UNSIGNED (BitT);
 
+  if (end < start)
+  {
+    throw std::range_error("end < start");
+  }
+  size_t n = end - start;
+  if (n == 0){
+    return;
+  }
+
   indent &= max_index<BitT> ();
+
+  if (offset * n + indent > bit_capacity<BitT> ())
+    {
+      throw std::overflow_error ("offset + indent > BitT capacity");
+    }
+
   if (offset > bit_capacity<T> ())
     {
       throw std::overflow_error ("offset > T capacity");
@@ -158,7 +173,7 @@ get_bulk (It start, It end, BitT bits, size_t offset = 1, int indent = 0)
 // insert atomic value to bitfield
 template <class T, class BitT>
 BitT
-set_scalar (BitT bits, int indent, size_t offset, T value)
+set_scalar (T value, BitT bits, size_t offset, int indent)
 {
   __BITF_ASSERT_UNSIGNED (BitT);
   __BITF_ASSERT_INTEGRAL (T);
@@ -308,7 +323,7 @@ public:
   constructor (T value, int indent, B bits = 0UL)
   {
     data<B>::_bits
-        = solid::set_scalar<T> (bits, indent, bit_size<T> (value), value);
+        = solid::set_scalar<T> (value, bits, bit_size<T> (value), indent);
   };
   /**
    * create bitfield with vector of atomic values
@@ -326,13 +341,13 @@ template <class T, class B = T> class accessor : public virtual data<B>
 public:
   // get atomic value from bitdata
   virtual T
-  get_scalar (int indent, size_t offset) const
+  get_scalar (size_t offset, int indent) const
   {
-    return solid::get_scalar<T> (data<B>::_bits, indent, offset);
+    return solid::get_scalar<T> (data<B>::_bits, offset, indent);
   };
   // get vector of n atomic values from bitdata
   virtual std::vector<T>
-  get_vector (int indent, size_t offset, size_t n) const
+  get_vector (size_t n, size_t offset, int indent = 0) const
   {
     auto vec = std::vector<T> (n);
     solid::get_bulk(vec.begin(), vec.end(), data<B>::_bits, offset, indent);
@@ -342,7 +357,7 @@ public:
   virtual T
   operator[] (int index) const
   {
-    return solid::get_scalar<T> (data<B>::_bits, index, 1);
+    return solid::get_scalar<T> (data<B>::_bits, 1UL, index);
   };
 };
 
@@ -358,15 +373,15 @@ public:
 
   // insert atomic value to bitfield
   virtual void
-  set_scalar (int indent, size_t offset, T value)
+  set_scalar (T value, size_t offset, int indent)
   {
     data<B>::_bits
-        = solid::set_scalar<T> (data<B>::_bits, indent, offset, value);
+        = solid::set_scalar<T> (value, data<B>::_bits, offset, indent);
   };
 
   // insert vector of atomic values to bitfield
   virtual void
-  set_vector (int indent, size_t offset, std::vector<T> values)
+  set_vector (std::vector<T> values, size_t offset, int indent = 0)
   {
     data<B>::_bits = solid::set_bulk(values.begin(), values.end(), data<B>::_bits,offset, indent);
   };
