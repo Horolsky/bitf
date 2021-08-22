@@ -5,40 +5,40 @@
 #include <type_traits>
 #include <vector>
 
-#define __BITF_STRINGIFY(T) #T
+#define _BITF_STRINGIFY(T) #T
 
-#define __BITF_ASSERT_MSG_UNSIGNED(T)                                         \
-  __BITF_STRINGIFY (T must be unsigned integer)
+#define _BITF_ASSERT_MSG_UNSIGNED(T)                                         \
+  _BITF_STRINGIFY (T must be unsigned integer)
 
-#define __BITF_ASSERT_MSG_INTEGRAL(T) __BITF_STRINGIFY (T must be integer)
+#define _BITF_ASSERT_MSG_INTEGRAL(T) _BITF_STRINGIFY (T must be integer)
 
-#define __BITF_ASSERT_MSG_ITERATOR(T)                                         \
-  __BITF_STRINGIFY (T must be pointer or iterator)
-
-/**
- * static assertion for unsigned type
- * */
-#define __BITF_ASSERT_INTEGRAL(T)                                             \
-  static_assert (std::is_integral<T>::value, __BITF_ASSERT_MSG_INTEGRAL (T))
+#define _BITF_ASSERT_MSG_ITERATOR(T)                                         \
+  _BITF_STRINGIFY (T must be pointer or iterator)
 
 /**
  * static assertion for unsigned type
  * */
-#define __BITF_ASSERT_UNSIGNED(T)                                             \
-  static_assert (std::is_unsigned<T>::value, __BITF_ASSERT_MSG_UNSIGNED (T))
+#define _BITF_ASSERT_INTEGRAL(T)                                             \
+  static_assert (std::is_integral<T>::value, _BITF_ASSERT_MSG_INTEGRAL (T))
+
+/**
+ * static assertion for unsigned type
+ * */
+#define _BITF_ASSERT_UNSIGNED(T)                                             \
+  static_assert (std::is_unsigned<T>::value, _BITF_ASSERT_MSG_UNSIGNED (T))
 
 template<class T> struct __deref_type     { typedef T type; };
 template<class T> struct __deref_type<T*> { typedef T type; };
 template<class T> struct __deref_type<T&> { typedef T type; };
 
-#define __BITF_VALUE_TYPE_OF(V) typename __deref_type<decltype(V)>::type; 
+#define _BITF_VALUE_TYPE_OF(V) typename __deref_type<decltype(V)>::type; 
 
-#define __BITF_ASSERT_ITERATOR(T)                                             \
+#define _BITF_ASSERT_ITERATOR(T)                                             \
   static_assert (                                                             \
       std::is_pointer<T>::value                                              \
           || !std::is_same<typename std::iterator_traits<T>::value_type,     \
                            void>::value,                                      \
-      __BITF_ASSERT_MSG_ITERATOR(T))
+      _BITF_ASSERT_MSG_ITERATOR(T))
 
 namespace bitf
 {
@@ -53,7 +53,7 @@ template <class T>
 inline T
 max_value ()
 {
-  __BITF_ASSERT_UNSIGNED (T);
+  _BITF_ASSERT_UNSIGNED (T);
   return ~0;
 }
 
@@ -62,7 +62,7 @@ template <class T>
 inline size_t
 bit_capacity ()
 {
-  __BITF_ASSERT_INTEGRAL (T);
+  _BITF_ASSERT_INTEGRAL (T);
   return sizeof (T) << 0b11;
 }
 
@@ -71,7 +71,7 @@ template <class T>
 inline size_t
 max_index ()
 {
-  __BITF_ASSERT_INTEGRAL (T);
+  _BITF_ASSERT_INTEGRAL (T);
   return (sizeof (T) << 0b11) - 1;
 }
 
@@ -80,7 +80,7 @@ template <class T>
 size_t
 bit_size (T value)
 {
-  __BITF_ASSERT_INTEGRAL (T);
+  _BITF_ASSERT_INTEGRAL (T);
   size_t n = 1;
   while (value >>= 1)
     {
@@ -94,7 +94,7 @@ template <class T>
 std::string
 to_string (T bits)
 {
-  __BITF_ASSERT_UNSIGNED (T);
+  _BITF_ASSERT_UNSIGNED (T);
   size_t size = bit_capacity<T> ();
   std::string res (size, '0');
   for (size_t i = 0; i < size; i++)
@@ -112,8 +112,8 @@ template <class T, class BitT>
 T
 get_scalar (BitT bits, size_t offset, int indent)
 {
-  __BITF_ASSERT_UNSIGNED (BitT);
-  __BITF_ASSERT_INTEGRAL (T);
+  _BITF_ASSERT_UNSIGNED (BitT);
+  _BITF_ASSERT_INTEGRAL (T);
 
   indent &= max_index<BitT> ();
   if (offset + indent > bit_capacity<BitT> ())
@@ -132,10 +132,10 @@ template <class It, class BitT>
 void
 get_bulk (It start, It end, BitT bits, size_t offset = 1, int indent = 0)
 {
-  __BITF_ASSERT_ITERATOR(It);
-  using T = __BITF_VALUE_TYPE_OF(*start);
-  __BITF_ASSERT_INTEGRAL (T);
-  __BITF_ASSERT_UNSIGNED (BitT);
+  _BITF_ASSERT_ITERATOR(It);
+  using T = _BITF_VALUE_TYPE_OF(*start);
+  _BITF_ASSERT_INTEGRAL (T);
+  _BITF_ASSERT_UNSIGNED (BitT);
 
   if (end < start)
   {
@@ -175,8 +175,8 @@ template <class T, class BitT>
 BitT
 set_scalar (T value, BitT bits, size_t offset, int indent)
 {
-  __BITF_ASSERT_UNSIGNED (BitT);
-  __BITF_ASSERT_INTEGRAL (T);
+  _BITF_ASSERT_UNSIGNED (BitT);
+  _BITF_ASSERT_INTEGRAL (T);
 
   indent &= max_index<BitT> ();
   if (offset + indent > bit_capacity<BitT> ())
@@ -201,10 +201,10 @@ template <class It, class BitT>
 BitT
 set_bulk (It start, It end, BitT bits, size_t offset = 1, int indent = 0)
 {
-  __BITF_ASSERT_ITERATOR(It);
-  using T = __BITF_VALUE_TYPE_OF(*start);
-  __BITF_ASSERT_INTEGRAL (T);
-  __BITF_ASSERT_UNSIGNED (BitT);
+  _BITF_ASSERT_ITERATOR(It);
+  using T = _BITF_VALUE_TYPE_OF(*start);
+  _BITF_ASSERT_INTEGRAL (T);
+  _BITF_ASSERT_UNSIGNED (BitT);
   
   if (end < start)
   {
@@ -262,7 +262,7 @@ namespace cls
 template <class T> class data
 {
 protected:
-  __BITF_ASSERT_UNSIGNED (T);
+  _BITF_ASSERT_UNSIGNED (T);
   T _bits;
 
 public:

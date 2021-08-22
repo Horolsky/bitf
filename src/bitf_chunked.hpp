@@ -17,7 +17,7 @@ template <class T>
 std::string
 to_str (const T *const chunks, size_t n)
 {
-  __BITF_ASSERT_UNSIGNED (T);
+  _BITF_ASSERT_UNSIGNED (T);
   const T CHUNK_SIZE = solid::bit_capacity<T> ();
   std::string res (CHUNK_SIZE * n, '0');
 
@@ -43,8 +43,8 @@ template <class T, class BitT>
 T
 get_scalar (BitT const *chunks, size_t n, int indent, const size_t offset)
 {
-  __BITF_ASSERT_UNSIGNED (BitT);
-  __BITF_ASSERT_INTEGRAL (T);
+  _BITF_ASSERT_UNSIGNED (BitT);
+  _BITF_ASSERT_INTEGRAL (T);
 
   const size_t CHUNK_SIZE = solid::bit_capacity<BitT> ();
   const size_t MAX_OFFSET = solid::bit_capacity<T> ();
@@ -112,7 +112,7 @@ struct _static
  */
 template <class T> struct _dynamic
 {
-  __BITF_ASSERT_UNSIGNED (T);
+  _BITF_ASSERT_UNSIGNED (T);
   std::vector<T> _data{};
   size_t
   chunks () const
