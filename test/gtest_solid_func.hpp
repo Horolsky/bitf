@@ -142,3 +142,19 @@ TEST (solid_func, fill_update)
 }
 
 #pragma endregion
+
+
+TEST (solid_func, index_of)
+{
+  int raw_arr[8] { 7, 0, 6, 1, 5, 2, 4, 0 };
+  auto bits = solid::set_bulk(raw_arr, raw_arr+8, 0UL, 3);
+  
+  for (int i = 0; i < 7; i++)
+  {
+    int found = solid::index_of(raw_arr[i], bits, 3);
+    EXPECT_EQ (found, i);
+  }
+  EXPECT_EQ (-1, solid::index_of(3, bits, 3));
+
+  EXPECT_THROW(solid::index_of(9, bits, 3), std::overflow_error);
+}

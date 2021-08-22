@@ -255,6 +255,44 @@ set_bulk (It start, It end, BitT bits, size_t offset = 1, int indent = 0)
     }
   return bits;
 }
+/**
+ * returns the first index at which a given element can be found in the bitf
+ * vector, or -1 if it is not present
+ */
+template <class T, class BitT>
+int
+index_of (T value, BitT bits, size_t offset, int indent = 0)
+{
+  _BITF_ASSERT_INTEGRAL (T);
+  _BITF_ASSERT_UNSIGNED (BitT);
+  if (offset > bit_capacity<T> ())
+    {
+      throw std::overflow_error ("offset > T capacity");
+    }
+  if (bit_size<T> (value) > offset)
+    {
+      throw std::overflow_error ("value size > offset");
+    }
+
+  indent &= max_index<BitT> ();
+  int n = (bit_capacity<BitT> () - indent) / offset;
+  int index = -1;
+
+  BitT offsetmask = max_value<BitT> () >> (bit_capacity<BitT> () - offset);
+
+  for (int i = 0; i < n; i++)
+    {
+      size_t rshift = (indent + (offset * i));
+      BitT shifted = bits >> rshift;
+      T current = (T)(shifted & offsetmask);
+      if (current == value)
+        {
+          index = i;
+          break;
+        }
+    }
+  return index;
+}
 
 namespace cls
 {
