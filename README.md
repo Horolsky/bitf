@@ -39,6 +39,9 @@ size_t bits = solid::set_bulk(
     );             
 // expected value of bits: 0b011100010101001110000111
 
+int index_of_5 = solid::index_of(5, bits, 3);
+// expected value of index_of_5: 4
+
 //same generic function with raw arrays
 int raw_arr[8] { 7, 0, 6, 1, 5, 2, 4, 3 };
 size_t val_4 = solid::set_bulk(raw_arr, raw_arr+8, 0UL, 3);
