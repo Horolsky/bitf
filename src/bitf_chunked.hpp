@@ -41,7 +41,7 @@ to_str (const T *const chunks, size_t n)
  */
 template <class T, class BitT>
 T
-get_scalar (BitT const *chunks, size_t n, int index, const size_t offset)
+get_scalar (BitT const *chunks, size_t n, int indent, const size_t offset)
 {
   __BITF_ASSERT_UNSIGNED (BitT);
   __BITF_ASSERT_INTEGRAL (T);
@@ -51,17 +51,17 @@ get_scalar (BitT const *chunks, size_t n, int index, const size_t offset)
   const size_t MAX_SCALAR = solid::max_value<T> ();
   const size_t BITS = CHUNK_SIZE * n;
 
-  index &= BITS - 1;
+  indent &= BITS - 1;
   if (offset > MAX_OFFSET)
     {
       throw std::overflow_error ("offset > max offset");
     }
-  if (offset + index > BITS)
+  if (offset + indent > BITS)
     {
-      throw std::overflow_error ("offset + index > chunks bitsize");
+      throw std::overflow_error ("offset + indent > chunks bitsize");
     }
   T res{ 0 };
-  size_t i = index % CHUNK_SIZE; // first chunk bit index
+  size_t i = indent % CHUNK_SIZE; // first chunk bit indent
   BitT const *chunk = chunks + (n - 1 - i / CHUNK_SIZE);
   BitT const *end = chunk - (offset + i - 1) / CHUNK_SIZE;
 
@@ -71,7 +71,7 @@ get_scalar (BitT const *chunks, size_t n, int index, const size_t offset)
   // overflow chunks bits
   if (chunk != end)
     {
-      i = CHUNK_SIZE - i;    // res bit index
+      i = CHUNK_SIZE - i;    // res bit indent
       while (--chunk >= end) // sic, reverse indexation
         {
           res |= ((T)(*chunk)) << i;

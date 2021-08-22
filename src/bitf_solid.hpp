@@ -110,34 +110,34 @@ to_string (T bits)
 // get atomic value from bitdata
 template <class T, class BitT>
 T
-get_scalar (BitT bits, int index, size_t offset = 1)
+get_scalar (BitT bits, int indent, size_t offset = 1)
 {
   __BITF_ASSERT_UNSIGNED (BitT);
   __BITF_ASSERT_INTEGRAL (T);
 
-  index &= max_index<BitT> ();
-  if (offset + index > bit_capacity<BitT> ())
+  indent &= max_index<BitT> ();
+  if (offset + indent > bit_capacity<BitT> ())
     {
-      throw std::overflow_error ("offset + index > BitT capacity");
+      throw std::overflow_error ("offset + indent > BitT capacity");
     }
   if (offset > bit_capacity<T> ())
     {
       throw std::overflow_error ("offset > T capacity");
     }
   BitT offsetmask = max_value<BitT> () >> (bit_capacity<BitT> () - offset);
-  return (T)(bits >> index) & offsetmask;
+  return (T)(bits >> indent) & offsetmask;
 }
 
 template <class It, class BitT>
 void
-get_bulk (It start, It end, BitT bits, size_t offset = 1, int index = 0)
+get_bulk (It start, It end, BitT bits, size_t offset = 1, int indent = 0)
 {
   __BITF_ASSERT_ITERATOR(It);
   using T = __BITF_VALUE_TYPE_OF(*start);
   __BITF_ASSERT_INTEGRAL (T);
   __BITF_ASSERT_UNSIGNED (BitT);
 
-  index &= max_index<BitT> ();
+  indent &= max_index<BitT> ();
   if (offset > bit_capacity<T> ())
     {
       throw std::overflow_error ("offset > T capacity");
@@ -148,7 +148,7 @@ get_bulk (It start, It end, BitT bits, size_t offset = 1, int index = 0)
 
   while (start < end)
     {
-      size_t rshift = (index + (offset * i++));
+      size_t rshift = (indent + (offset * i++));
       BitT shifted = bits >> rshift;
       BitT val = (shifted & offsetmask);
       *(start++) = (T)val;
@@ -158,33 +158,33 @@ get_bulk (It start, It end, BitT bits, size_t offset = 1, int index = 0)
 // insert atomic value to bitfield
 template <class T, class BitT>
 BitT
-set_scalar (BitT bits, int index, size_t offset, T value)
+set_scalar (BitT bits, int indent, size_t offset, T value)
 {
   __BITF_ASSERT_UNSIGNED (BitT);
   __BITF_ASSERT_INTEGRAL (T);
 
-  index &= max_index<BitT> ();
-  if (offset + index > bit_capacity<BitT> ())
+  indent &= max_index<BitT> ();
+  if (offset + indent > bit_capacity<BitT> ())
     {
-      throw std::overflow_error ("offset + index > BitT capacity");
+      throw std::overflow_error ("offset + indent > BitT capacity");
     }
   if (bit_size<T> (value) > offset)
     {
       throw std::overflow_error ("value bit width > offset");
     }
   BitT offsetmask
-      = max_value<BitT> () >> (bit_capacity<BitT> () - (offset + index));
+      = max_value<BitT> () >> (bit_capacity<BitT> () - (offset + indent));
   BitT indexmask = offsetmask >> offset;
   BitT mask = ~(offsetmask ^ indexmask);
   bits &= mask;
-  bits |= (value << index);
+  bits |= (value << indent);
   return bits;
 }
 
 // update bitfield with generic container
 template <class It, class BitT>
 BitT
-set_bulk (It start, It end, BitT bits, size_t offset = 1, int index = 0)
+set_bulk (It start, It end, BitT bits, size_t offset = 1, int indent = 0)
 {
   __BITF_ASSERT_ITERATOR(It);
   using T = __BITF_VALUE_TYPE_OF(*start);
@@ -199,14 +199,14 @@ set_bulk (It start, It end, BitT bits, size_t offset = 1, int index = 0)
   if (n == 0){
     return bits;
   }
-  index &= max_index<BitT> ();
+  indent &= max_index<BitT> ();
 
-  if (offset * n + index > bit_capacity<BitT> ())
+  if (offset * n + indent > bit_capacity<BitT> ())
     {
-      throw std::overflow_error ("offset + index > BitT capacity");
+      throw std::overflow_error ("offset + indent > BitT capacity");
     }
 
-  size_t maxn = (bit_capacity<BitT> () - index) / offset;
+  size_t maxn = (bit_capacity<BitT> () - indent) / offset;
   if (n > maxn)
     {
       throw std::overflow_error ("cont size > BitT capacity");
@@ -228,14 +228,14 @@ set_bulk (It start, It end, BitT bits, size_t offset = 1, int index = 0)
     }
 
   BitT offsetmask
-      = max_value<BitT> () >> (bit_capacity<BitT> () - (offset * n + index));
+      = max_value<BitT> () >> (bit_capacity<BitT> () - (offset * n + indent));
   BitT indexmask = offsetmask >> (offset * n);
   BitT mask = ~(offsetmask ^ indexmask);
   bits &= mask;
   i = 0;
   while (i < n)
     {
-      bits |= ((BitT)start[i] << (offset * i + index));
+      bits |= ((BitT)start[i] << (offset * i + indent));
       i++;
     }
   return bits;
@@ -305,18 +305,18 @@ public:
    * create bitfield with atomic value
    * other bits are set to 0
    */
-  constructor (T value, int index, B bits = 0UL)
+  constructor (T value, int indent, B bits = 0UL)
   {
     data<B>::_bits
-        = solid::set_scalar<T> (bits, index, bit_size<T> (value), value);
+        = solid::set_scalar<T> (bits, indent, bit_size<T> (value), value);
   };
   /**
    * create bitfield with vector of atomic values
    * other bits are set to 0
    */
-  constructor (std::vector<T> values, int index, size_t offset, B bits = 0UL)
+  constructor (std::vector<T> values, int indent, size_t offset, B bits = 0UL)
   {
-    data<B>::_bits = solid::set_bulk(values.begin(), values.end(), (B) bits, offset, index);
+    data<B>::_bits = solid::set_bulk(values.begin(), values.end(), (B) bits, offset, indent);
   };
   virtual ~constructor () = default;
 };
@@ -326,16 +326,16 @@ template <class T, class B = T> class accessor : public virtual data<B>
 public:
   // get atomic value from bitdata
   virtual T
-  get_scalar (int index, size_t offset) const
+  get_scalar (int indent, size_t offset) const
   {
-    return solid::get_scalar<T> (data<B>::_bits, index, offset);
+    return solid::get_scalar<T> (data<B>::_bits, indent, offset);
   };
   // get vector of n atomic values from bitdata
   virtual std::vector<T>
-  get_vector (int index, size_t offset, size_t n) const
+  get_vector (int indent, size_t offset, size_t n) const
   {
     auto vec = std::vector<T> (n);
-    solid::get_bulk(vec.begin(), vec.end(), data<B>::_bits, offset, index);
+    solid::get_bulk(vec.begin(), vec.end(), data<B>::_bits, offset, indent);
     return vec;
   };
   // get single bit value by index
@@ -358,17 +358,17 @@ public:
 
   // insert atomic value to bitfield
   virtual void
-  set_scalar (int index, size_t offset, T value)
+  set_scalar (int indent, size_t offset, T value)
   {
     data<B>::_bits
-        = solid::set_scalar<T> (data<B>::_bits, index, offset, value);
+        = solid::set_scalar<T> (data<B>::_bits, indent, offset, value);
   };
 
   // insert vector of atomic values to bitfield
   virtual void
-  set_vector (int index, size_t offset, std::vector<T> values)
+  set_vector (int indent, size_t offset, std::vector<T> values)
   {
-    data<B>::_bits = solid::set_bulk(values.begin(), values.end(), data<B>::_bits,offset, index);
+    data<B>::_bits = solid::set_bulk(values.begin(), values.end(), data<B>::_bits,offset, indent);
   };
 };
 

@@ -14,8 +14,8 @@ cout << bitf::solid::to_string<uint8_t>(a) << endl;
 
 a = bitf::solid::set_scalar<uint8_t>(
     a   // to bitfield target x 
-    7,  // on index 7
-    1,  // with bit offset 1
+    7,  // indent 7
+    1,  // offset 1
     1,  // insert value 1
     ); 
 
@@ -24,7 +24,7 @@ a = bitf::solid::set_scalar<uint8_t>(
 //note that scalar values type can be different from bitfield type
 int scalar = bitf::solid::get_scalar<int>(
     a,  // getting few bits as single value from bitfield source x
-    3,  // from index 3
+    3,  // indent 3
     3   // offset 3
     ); 
 // expected scalar value: 0b101                    
@@ -49,7 +49,7 @@ solid::get_bulk(
     bucket+4,       // ending iterator
     val_4,          // target bits
     3,              // offset
-    2               // index (bitwise, not offset)
+    2               // indent
     );
 // expected value of bucket: { 2, 3, 4, 1 }
 ```
@@ -68,8 +68,8 @@ public virtual bitf::solid::mutator<size_t>  // exclude mutator to get immutable
 
 BitField x {};          // initialized to 0
 x.set_vector(
-    1,                  // to index
-    2                   // with offset
+    1,                  // indent
+    2                   // offset
     {1,0,2,0,3},        // insert data
     );                  
 // expected value of x.bits(): 0b11001000010
