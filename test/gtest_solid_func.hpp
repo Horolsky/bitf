@@ -142,3 +142,30 @@ TEST (solid_func, fill_update)
 }
 
 #pragma endregion
+
+
+TEST (solid_func, big_shift)
+{
+  uint64_t before = 0b001010100010101010101010101010101010101010101010101010101010;
+
+  uint64_t after1 = solid::set_scalar(1,before,2,50); 
+  EXPECT_NE (before, after1);
+
+  uint64_t after2 = solid::set_scalar(2,before,2,50); 
+  EXPECT_NE (before, after2);
+
+  uint64_t after3 = solid::set_scalar(3,before,2,50);  
+  EXPECT_NE (before, after3);
+  
+  EXPECT_NE (after1, after3);
+  EXPECT_NE (after2, after3);
+  EXPECT_NE (after2, after3);
+
+  int value1 = solid::get_scalar<int>(after1,2,50);
+  int value2 = solid::get_scalar<int>(after2,2,50);
+  int value3 = solid::get_scalar<int>(after3,2,50);
+
+  EXPECT_EQ(value1,1);
+  EXPECT_EQ(value2,2);
+  EXPECT_EQ(value3,3);
+}

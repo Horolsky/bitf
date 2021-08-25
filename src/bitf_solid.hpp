@@ -195,7 +195,7 @@ set_scalar (T value, BitT bits, size_t offset, int indent)
   BitT indexmask = offsetmask >> offset;
   BitT mask = ~(offsetmask ^ indexmask);
   bits &= mask;
-  bits |= (value << indent);
+  bits |= ((BitT) value << indent);
   return bits;
 }
 
