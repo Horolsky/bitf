@@ -182,37 +182,21 @@ set_bulk (It start, It end, BitT bits, size_t offset = 1, size_t indent = 0) noe
  */
 template <class T, class BitT>
 int
-index_of (T value, BitT bits, size_t offset, int indent = 0)
+index_of (T value, BitT bits, size_t offset, size_t indent = 0) noexcept
 {
   _BITF_ASSERT_INTEGRAL (T);
   _BITF_ASSERT_UNSIGNED (BitT);
-  if (offset > bit_capacity<T> ())
-    {
-      throw std::overflow_error ("offset > T capacity");
-    }
-  if (bit_size<T> (value) > offset)
-    {
-      throw std::overflow_error ("value size > offset");
-    }
 
-  indent &= max_index<BitT> ();
-  int n = (bit_capacity<BitT> () - indent) / offset;
-  int index = -1;
-
-  BitT offsetmask = max_value<BitT> () >> (bit_capacity<BitT> () - offset);
-
-  for (int i = 0; i < n; i++)
+  int i = 0;
+  BitT offsetmask = ~(max_value<BitT>() << (offset));
+  while(indent < bit_capacity<BitT> ())
     {
-      size_t rshift = (indent + (offset * i));
-      BitT shifted = bits >> rshift;
-      T current = (T)(shifted & offsetmask);
-      if (current == value)
-        {
-          index = i;
-          break;
-        }
+      T current = (T)(bits >> indent & offsetmask);
+      if (current == value) return i;
+      indent += offset;
+      ++i;
     }
-  return index;
+  return -1;
 }
 
 namespace cls

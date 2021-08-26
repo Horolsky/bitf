@@ -188,6 +188,4 @@ TEST (solid_func, index_of)
     EXPECT_EQ (found, i);
   }
   EXPECT_EQ (-1, solid::index_of(3, bits, 3));
-
-  EXPECT_THROW(solid::index_of(9, bits, 3), std::overflow_error);
 }
