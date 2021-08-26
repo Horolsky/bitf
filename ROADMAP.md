@@ -1,23 +1,38 @@
 # BITF DEVELOPMENT ROADMAP
 
-## Idea
-Granular bitwise operations on bitfields:
-- adjustable bitfield data storage size, both static and dynamic;
-- get/set the scalar value of adjustable bit offset;
-- get/set the vector of values of adjustable continuous bit offset;
-- both functional and objective oriented implementations;
+## Idea  
+Granular bitwise operations on bitfields:  
+- scalar and vector bitfield data storage of adjustable size, both static and dynamic;  
+- get/set the scalar value of adjustable bit indent and offset;  
+- get/set the vector of values of adjustable bit indent and continuous offset;  
+- low level raw functions + OOP & FP wrappings  
 
-## Stage 1
-- [x] clean functional implementation wrapped in a template static class that operates on a primitive type;
+## Structure  
+Current working structure:  
+- **solid** namespace: scalar storage  
+    - [x] raw functions without overflow check (noexcept)  
+    - [] FP wrappings  
+    - [x] OOP wrappings: **cls** namespace (*in progress*)  
+- **chunked** namespace: vector storage  
+    - [] raw functions (*few examples completed*)  
+    - [x] **_static** storage  
+    - [x] **_dynamic** storage  
+    - [] FP wrappings  
+    - [] OOP wrappings  
+ 
+ ## API concepts  
+raw functions are error prone, all runtime checks delegated to their clients.  
+common template parameters for raw functions:  
+ - bitfield storage type (unsigned integer)  
+ - value type for scalar getters/setters,   
+ - collection iterator/pointer type for bulk getters/setters  
+keeping bitfield type parameter at the end of the parameter list allows the compiler to determine its type implicitly from the function arguments
 
-## Stage 2
-- [x] OOP wrappers that follow the separation of concerns:
-    - [x] raw bitfield data storage in primitive type;
-    - [x] granular bitfield constructor, accessor and mutator that provides an interface to data. 
+ 
+order of arguments for raw functions:
+```c++
+context args..., BitfieldType bits, size_t offset, size_t indent
+```
 
-## Stage 3
-- Separation of data storage and interfaces through the pure abstract classes;
-- Data storage wrapper in 2 versions:
-    - static array of primitives (this will override the Stage 1 version);
-    - dynamic array of primitives;
-- Remove control on the primitive type from the data storage template, use the bit size as a template parameter instead;
+
+

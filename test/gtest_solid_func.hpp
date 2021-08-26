@@ -53,6 +53,14 @@ TEST (solid_func, util_str)
 
 #pragma region TEST_FUNC_GETTERS
 
+TEST (solid_func, indexation_normal)
+{
+  uint8_t bits = 0b11100100;
+  EXPECT_EQ (solid::get_scalar<int>(bits, 2, 0), 0);
+  EXPECT_EQ (solid::get_scalar<int>(bits, 2, 2), 1);
+  EXPECT_EQ (solid::get_scalar<int>(bits, 2, 4), 2);
+  EXPECT_EQ (solid::get_scalar<int>(bits, 2, 6), 3);
+}
 TEST (solid_func, get_scalar)
 {
   EXPECT_EQ (solid::get_scalar<size_t> (0b10000101U, 1, 2), 1);
